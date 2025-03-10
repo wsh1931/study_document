@@ -4612,9 +4612,11 @@ nohup java -Xms512m -Xmx1024m -jar xxxx.jar --spring.profiles.active=prod &
 **-xmn 与 -XX:newSize 区别**
 
 **-XX:newSize**
+
 仅用于设置新生代的初始大小，需配合 -XX:MaxnewSize 共同使用以限定新生代的最大上限
 
 ​**-Xmn**
+
 直接指定新生代的初始大小和最大上限，等价于同时设置 -XX:newSize 和 -XX:MaxnewSize
 
 ##### JVM 调优的工具
