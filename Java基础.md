@@ -17,7 +17,11 @@ public class Demo01_Annotation extends Object {
 
 ## 内置注解
 
+
+
 ![image-20210216173225256](D:\学习经验\study_document\images\2.png)
+
+
 
 ```java
 // 什么是注解
@@ -76,7 +80,7 @@ public class Demo02_MetaAnnotation {
 @interface MyAnnotation { }
 ```
 
-![image-20210216182116415](D:\学习经验\study_document\images\4.png)
+![image-20210216182116415](D:\Typora\images\4.png)
 
 ```java
 //自定义注解
