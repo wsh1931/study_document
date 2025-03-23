@@ -2,7 +2,7 @@
 
 ## 注解入门
 
-![什么是注解](.\images\1.png)
+![什么是注解](./images/1.png)
 
 ```java
 //什么是注解
@@ -19,7 +19,7 @@ public class Demo01_Annotation extends Object {
 
 
 
-![image-20210216173225256](.\images\2.png)
+![image-20210216173225256](./images/2.png)
 
 
 
@@ -54,7 +54,7 @@ public class Demo01_Annotation extends Object {
 
 ## 自定义注解,元注解
 
-![image-20210216180713223](.\images\3.png) 
+![image-20210216180713223](./images/3.png) 
 
 ```java
 //测试元注解
@@ -109,21 +109,21 @@ public class Demo03_CustomAnnotation {
 
 ### 静态 & 动态语言
 
-![image-20210216184313269](.\images\5.png)
+![image-20210216184313269](./images/5.png)
 
 ### 反射机制概念
 
-![image-20210216184924651](.\images\6.png)
+![image-20210216184924651](./images/6.png)
 
 ### 反射机制研究与应用
 
-![image-20210216185137513](.\images\7.png)
+![image-20210216185137513](./images/7.png)
 
 ### 反射机制优缺点
 
-![image-20210216185230072](.\images\8.png)
+![image-20210216185230072](./images/8.png)
 
-![image-20210216185326797](.\images\9.png)
+![image-20210216185326797](./images/9.png)
 
 ### 实现
 
@@ -196,15 +196,15 @@ class User {
 
 ### class类介绍
 
-![image-20210216190910198](.\images\10.png)
+![image-20210216190910198](./images/10.png)
 
-![image-20210216191140821](.\images\11.png)
+![image-20210216191140821](./images/11.png)
 
-![image-20210216191422819](.\images\13.png)
+![image-20210216191422819](./images/13.png)
 
 ### 获取Class类的实例
 
-![image-20210216191541455](.\images\12.png)
+![image-20210216191541455](./images/12.png)
 
 ```java
 //测试class类的创建方式有哪些
@@ -269,7 +269,7 @@ class Teacher extends Person {
 
 ### 哪些类型可以有Class对象
 
-![image-20210216192745039](.\images\14.png)
+![image-20210216192745039](./images/14.png)
 
 ```java
 //所有类型的Class
@@ -307,13 +307,13 @@ public class Demo06_AllTypeClass {
 
 ### Java内存分析
 
-![image-20210216194320837](.\images\15.png)
+![image-20210216194320837](./images/15.png)
 
 ### 类的加载
 
-![image-20210216194443232](.\images\16.png)
+![image-20210216194443232](./images/16.png)
 
-![image-20210216194522442](.\images\17.png)
+![image-20210216194522442](./images/17.png)
 
 深刻理解类加载:https://blog.csdn.net/m0_38075425/article/details/81627349
 
@@ -352,13 +352,13 @@ class A {
 
 分析上面代码
 
-![image-20210216200336439](.\images\18.png)
+![image-20210216200336439](./images/18.png)
 
 程序自上往下执行
 
 ### 什么时候会发生类初始化
 
-![image-20210216201156532](.\images\19.png)
+![image-20210216201156532](./images/19.png)
 
 ```java
 //测试类什么时候会初始化
@@ -400,9 +400,9 @@ class Son extends Father {
 
 ### 类加载器的作用
 
-![image-20210216202554642](.\images\20.png)
+![image-20210216202554642](./images/20.png)
 
-![image-20210216202736261](.\images\21.png)
+![image-20210216202736261](./images/21.png)
 
 > ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();//获取系统类的加载器
 >
@@ -477,7 +477,7 @@ public class Demo09_ClassLoader1 {
 
 ## 获取运行类的完整结构
 
-![image-20210216204339529](.\images\22.png)
+![image-20210216204339529](./images/22.png)
 
 ### 方法:
 
@@ -576,21 +576,21 @@ public class Demo10_ClassInfo {
 
 ```
 
-![image-20210217122356362](.\images\23.png)
+![image-20210217122356362](./images/23.png)
 
 ## 调用运行时类的指定结构
 
 ### 有Class对象,能做什么
 
-![image-20210217124548374](.\images\24.png)
+![image-20210217124548374](./images/24.png)
 
 ### 方法
 
-![image-20210219095443008](.\images\25.png)
+![image-20210219095443008](./images/25.png)
 
-![image-20210219095529656](.\images\26.png)
+![image-20210219095529656](./images/26.png)
 
-![image-20210219095603902](.\images\27.png)
+![image-20210219095603902](./images/27.png)
 
 >//获得Class对象
 >
@@ -710,7 +710,7 @@ public class Demo12_Performance {
 
 ##反射操作泛型
 
-![image-20210219111655554](.\images\28.png)
+![image-20210219111655554](./images/28.png)
 
 ```java
 //通过反射获取泛型
@@ -758,9 +758,9 @@ public class Demo13_Generic {
 
 ## 反射操作注解
 
-![image-20210219114219419](.\images\29.png)
+![image-20210219114219419](./images/29.png)
 
-![image-20210219114249940](.\images\30.png)
+![image-20210219114249940](./images/30.png)
 
 ```java
 //练习反射操作注解
