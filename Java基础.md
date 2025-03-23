@@ -1027,3 +1027,188 @@ class Zi extends Fu{}
 - 如果在定义类、方法、接口的时候：如果类型不确定，可以使用泛型
 - 如果类型不确定，但知道以后只能传递某个继承体系中的类型，可以使用通配符
   - 关键点：通配符可以限定类型的范围
+
+# 函数式接口
+
+## **概述**
+
+- 只有一个抽象方法的接口，称之为函数接口
+- JDK的函数式接口都加上了@FunctionalInterface注解进行标识，但是无论是否加上该注解，只要接口中只有一个抽象方法，都是函数式接口
+
+## 常见的函数式接口
+
+### Consumer
+
+消费者接口：
+
+- 可以在方法中对传入的参数进行消费
+
+```java
+@FunctionalInterface
+public interface Consumer<T> {
+
+    /**
+     * Performs this operation on the given argument.
+     * @param t the input argument
+     */
+    void accept(T t);
+}
+
+```
+
+### Function
+
+计算转换接口：
+
+- 在方法中对传入的参数计算或转换
+
+```java
+@FunctionalInterface
+public interface Function<T, R> {
+
+    /**
+     * Applies this function to the given argument.
+     * @param t the function argument
+     * @return the function result
+     */
+    R apply(T t);
+}
+
+```
+
+| **接口方法**                                                 | **方法描述**                                                 |
+| :----------------------------------------------------------- | ------------------------------------------------------------ |
+| `R apply(T t)`                                               | 将此参数应用到函数中，并返回结果 `R`。                       |
+| `Function<T, R> andThen(Function<? super R, ? extends V> after)` | 返回一个组合函数，先将当前函数的结果应用到 `after` 函数中，最终返回结果 `V`。 |
+| `Function<T, R> compose(Function<? super V, ? extends T> before)` | 返回一个组合函数，先将入参应用到 `before` 函数，再将结果传递给当前函数处理。 |
+
+**apply(T t)**
+
+```java
+Function<String, String> function = a -> a + " Jack!";
+System.out.println(function.apply("Hello")); // Hello Jack!
+```
+
+**andThen(Function<? super R,? extends V> after)**
+
+```java
+Function<String, String> function = a -> a + " Jack!";
+Function<String, String> function1 = a -> a + " Bob!";
+String greet = function.andThen(function1).apply("Hello");
+System.out.println(greet); // Hello Jack! Bob!
+```
+
+**compose(Function<? super V,? extends T> before)**
+
+```java
+Function<String, String> function = a -> a + " Jack!";
+Function<String, String> function1 = a -> a + " Bob!";
+String greet = function.compose(function1).apply("Hello");
+System.out.println(greet); // Hello Bob! Jack!
+```
+
+### Predicate
+
+判断接口：
+
+- 对传入的参数条件判断，返回判断结果
+
+```java
+@FunctionalInterface
+public interface Predicate<T> {
+
+    /**
+     * Evaluates this predicate on the given argument.
+     *
+     * @param t the input argument
+     * @return {@code true} if the input argument matches the predicate,
+     * otherwise {@code false}
+     */
+    boolean test(T t);
+}
+
+```
+
+### Supplier
+
+生产型接口：
+
+- 在方法中创建对象，把创建好的对象返回
+
+```java
+@FunctionalInterface
+public interface Supplier<T> {
+
+    /**
+     * Gets a result.
+     *
+     * @return a result
+     */
+    T get();
+}
+
+```
+
+## 常用的默认方法
+
+### and
+
+使用Predicate接口时候，进行判断条件的拼接，and方法相当于是使用&&来拼接两个判断条件
+
+```java
+        // 打印作家中年龄大于17并且姓名长度大于1的作家
+        Authors.getAuthors().stream()
+                .filter(new Predicate<Author>() {
+                    @Override
+                    public boolean test(Author author) {
+                        return author.getAge() > 17;
+                    }
+                }.and(new Predicate<Author>() {
+                    @Override
+                    public boolean test(Author author) {
+                        return author.getName().length() > 1;
+                    }
+                }))
+   .forEach(author -> System.out.println(author.getAge() + ":" + author.getName()));
+
+```
+
+### or
+
+使用Predicate接口时候，进行判断条件的拼接，or方法相当于是使用||来拼接两个判断条件
+
+```java
+        // 打印作家中年龄大于17或者姓名的长度小于2的作家
+        Authors.getAuthors().stream()
+                .distinct()
+                .filter((new Predicate<Author>() {
+                    @Override
+                    public boolean test(Author author) {
+                        return author.getAge() > 17;
+                    }
+                }).or(new Predicate<Author>() {
+                    @Override
+                    public boolean test(Author author) {
+                        return author.getName().length() < 2;
+                    }
+                })).forEach(author -> System.out.println(author.getAge() + ":" + author.getName()));
+
+```
+
+### negate
+
+使用Predicate接口时候，进行判断条件的拼接，negate方法相当于是在判断条件前取反
+
+```java
+        // 打印作家中年龄不大于17的作家
+        Authors.getAuthors().stream()
+                .filter(new Predicate<Author>() {
+                    @Override
+                    public boolean test(Author author) {
+                        return author.getAge() > 17;
+                    }
+                }.negate())
+                .forEach(author -> System.out.println(author.getAge() + ":" + author.getName()));
+
+```
+
