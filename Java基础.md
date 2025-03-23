@@ -2,7 +2,7 @@
 
 ## 注解入门
 
-![什么是注解](D:\学习经验\study_document\images\1.png)
+![什么是注解](.\images\1.png)
 
 ```java
 //什么是注解
@@ -19,7 +19,7 @@ public class Demo01_Annotation extends Object {
 
 
 
-![image-20210216173225256](D:\学习经验\study_document\images\2.png)
+![image-20210216173225256](.\images\2.png)
 
 
 
@@ -54,7 +54,7 @@ public class Demo01_Annotation extends Object {
 
 ## 自定义注解,元注解
 
-![image-20210216180713223](D:\学习经验\study_document\images\3.png) 
+![image-20210216180713223](.\images\3.png) 
 
 ```java
 //测试元注解
@@ -109,21 +109,21 @@ public class Demo03_CustomAnnotation {
 
 ### 静态 & 动态语言
 
-![image-20210216184313269](D:\学习经验\study_document\images\5.png)
+![image-20210216184313269](.\images\5.png)
 
 ### 反射机制概念
 
-![image-20210216184924651](D:\学习经验\study_document\images\6.png)
+![image-20210216184924651](.\images\6.png)
 
 ### 反射机制研究与应用
 
-![image-20210216185137513](D:\学习经验\study_document\images\7.png)
+![image-20210216185137513](.\images\7.png)
 
 ### 反射机制优缺点
 
-![image-20210216185230072](D:\学习经验\study_document\images\8.png)
+![image-20210216185230072](.\images\8.png)
 
-![image-20210216185326797](D:\学习经验\study_document\images\9.png)
+![image-20210216185326797](.\images\9.png)
 
 ### 实现
 
@@ -196,15 +196,15 @@ class User {
 
 ### class类介绍
 
-![image-20210216190910198](D:\学习经验\study_document\images\10.png)
+![image-20210216190910198](.\images\10.png)
 
-![image-20210216191140821](D:\学习经验\study_document\images\11.png)
+![image-20210216191140821](.\images\11.png)
 
-![image-20210216191422819](D:\学习经验\study_document\images\13.png)
+![image-20210216191422819](.\images\13.png)
 
 ### 获取Class类的实例
 
-![image-20210216191541455](D:\学习经验\study_document\images\12.png)
+![image-20210216191541455](.\images\12.png)
 
 ```java
 //测试class类的创建方式有哪些
@@ -269,7 +269,7 @@ class Teacher extends Person {
 
 ### 哪些类型可以有Class对象
 
-![image-20210216192745039](D:\学习经验\study_document\images\14.png)
+![image-20210216192745039](.\images\14.png)
 
 ```java
 //所有类型的Class
@@ -307,13 +307,13 @@ public class Demo06_AllTypeClass {
 
 ### Java内存分析
 
-![image-20210216194320837](D:\学习经验\study_document\images\15.png)
+![image-20210216194320837](.\images\15.png)
 
 ### 类的加载
 
-![image-20210216194443232](D:\学习经验\study_document\images\16.png)
+![image-20210216194443232](.\images\16.png)
 
-![image-20210216194522442](D:\学习经验\study_document\images\17.png)
+![image-20210216194522442](.\images\17.png)
 
 深刻理解类加载:https://blog.csdn.net/m0_38075425/article/details/81627349
 
@@ -352,13 +352,13 @@ class A {
 
 分析上面代码
 
-![image-20210216200336439](D:\学习经验\study_document\images\18.png)
+![image-20210216200336439](.\images\18.png)
 
 程序自上往下执行
 
 ### 什么时候会发生类初始化
 
-![image-20210216201156532](D:\学习经验\study_document\images\19.png)
+![image-20210216201156532](.\images\19.png)
 
 ```java
 //测试类什么时候会初始化
@@ -400,9 +400,9 @@ class Son extends Father {
 
 ### 类加载器的作用
 
-![image-20210216202554642](D:\学习经验\study_document\images\20.png)
+![image-20210216202554642](.\images\20.png)
 
-![image-20210216202736261](D:\学习经验\study_document\images\21.png)
+![image-20210216202736261](.\images\21.png)
 
 > ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();//获取系统类的加载器
 >
@@ -477,7 +477,7 @@ public class Demo09_ClassLoader1 {
 
 ## 获取运行类的完整结构
 
-![image-20210216204339529](D:\学习经验\study_document\images\22.png)
+![image-20210216204339529](.\images\22.png)
 
 ### 方法:
 
@@ -576,21 +576,21 @@ public class Demo10_ClassInfo {
 
 ```
 
-![image-20210217122356362](D:\学习经验\study_document\images\23.png)
+![image-20210217122356362](.\images\23.png)
 
 ## 调用运行时类的指定结构
 
 ### 有Class对象,能做什么
 
-![image-20210217124548374](D:\学习经验\study_document\images\24.png)
+![image-20210217124548374](.\images\24.png)
 
 ### 方法
 
-![image-20210219095443008](D:\学习经验\study_document\images\25.png)
+![image-20210219095443008](.\images\25.png)
 
-![image-20210219095529656](D:\学习经验\study_document\images\26.png)
+![image-20210219095529656](.\images\26.png)
 
-![image-20210219095603902](D:\学习经验\study_document\images\27.png)
+![image-20210219095603902](.\images\27.png)
 
 >//获得Class对象
 >
@@ -710,7 +710,7 @@ public class Demo12_Performance {
 
 ##反射操作泛型
 
-![image-20210219111655554](D:\学习经验\study_document\images\28.png)
+![image-20210219111655554](.\images\28.png)
 
 ```java
 //通过反射获取泛型
@@ -758,9 +758,9 @@ public class Demo13_Generic {
 
 ## 反射操作注解
 
-![image-20210219114219419](D:\学习经验\study_document\images\29.png)
+![image-20210219114219419](.\images\29.png)
 
-![image-20210219114249940](D:\学习经验\study_document\images\30.png)
+![image-20210219114249940](.\images\30.png)
 
 ```java
 //练习反射操作注解
@@ -857,3 +857,173 @@ class Student2 {
     int length();
 }
 ```
+
+# 泛型
+
+## 泛型知识点
+
+JDK5之后的特性，可以在编译阶段约束操作的数据类型，只支持引用数据类型
+
+泛型的格式：`<数据类型>`
+
+```java
+ArrayList<String> list = new ArrayList<>();
+```
+
+泛型的好处：
+
+- 统一数据类型
+- 把运行时期的问题提前到了编译时期，避免了强制类型转换可能出现的异常，因为在编译阶段类型就能确定下来
+
+
+泛型的细节：
+
+- Java的泛型是伪泛型，存在泛型的擦除：在编译的时候检查泛型的类型
+- 制定泛型的具体类型后，在传递数据时，可以传入该类型或者其子类
+- 如果不写泛型，默认Object
+
+## 泛型类
+
+使用场景：当一个类中，某个变量的数据类型不确定时，就可以定义带有泛型的类
+
+```java
+// 修饰符 class 类名<类型>{}
+public class ArrayList<E>{}
+```
+
+E可以理解为变量，不是用来记录数据，而是记录数据的类型，可以写成T、E、K、V
+
+## 泛型方法
+
+方法中形参类型不确定时：
+
+- 使用类名后面定义的泛型
+  - 所有方法都能用
+- 在方法申明上定义自己的方法
+  - 只有本方法能用
+
+```java
+// 修饰符 <类型> 返回值类型 方法名(类型 变量名){} 
+public <T> void show(T t){}
+```
+
+```java
+
+public class ListUtil {
+    // 工具类，用来添加多个集合的元素
+
+    //私有化构造方法
+    private ListUtil(){}
+
+    public static<E> void addAll1(ArrayList<E> list, E e1, E e2, E e3, E e4){
+        list.add(e1);
+        list.add(e2);
+        list.add(e3);
+        list.add(e4);
+    }
+
+    public static<E> void addAll2(ArrayList<E> list, E...e){
+        for (E ele : e) {
+            list.add(ele);
+        }
+    }
+
+}
+```
+
+#  泛型接口
+
+格式：
+
+```java
+// 修饰符 interface 接口名<类型>{}
+public inteface List<E>{}
+```
+
+使用方法：
+
+1. 实现类给出具体类型
+2. 实现类延续泛型，创建对象时再确定
+
+```java
+public class GenericsDemo2 {
+    public static void main(String[] args) {
+        MyArrayList1 list1 = new MyArrayList1();
+        list1.add("aaa");
+        list1.add("aaa");
+        list1.add("aaa");
+
+        MyArrayList2<String> list2 = new MyArrayList2<>();
+        list2.add("aaa");
+        list2.add("aaa");
+        list2.add("aaa");
+    }
+}
+
+```
+
+## 泛型的继承和通配符
+
+泛型不具备继承性，但是数据具备继承性
+
+```java
+public class GenericsDemo3 {
+    public static void main(String[] args) {
+        ArrayList<Ye> list1 = new ArrayList<>();
+        ArrayList<Fu> list2 = new ArrayList<>();
+        ArrayList<Zi> list3 = new ArrayList<>();
+
+        // 调用method方法
+        method(list1);
+        // 下方报错（泛型不具备继承性）
+        // method(list2);
+        // method(list3);
+
+        // 数据具备继承性
+        list1.add(new Ye());
+        list1.add(new Fu());
+        list1.add(new Zi());
+
+        // 通配符
+        method2(list1);
+        method2(list2);
+        method2(list3);
+
+        method3(list1);
+        method3(list2);
+        method3(list3);
+    }
+
+    /*
+    * 这里的泛型里面写的是什么类型，那就只能传递什么类型的数据
+    * */
+    public static void method(ArrayList<Ye> list){}
+
+    public static void method2(ArrayList<? extends Ye> list){}
+
+    public static void method3(ArrayList<? super Zi> list){}
+}
+
+
+class Ye{}
+
+class Fu extends Ye{}
+
+class Zi extends Fu{}
+```
+
+
+
+当不确定方法中传入的数据类型时，可以使用泛型，但泛型可以接受任意的数据类型，无法做出类型的限制
+
+泛型的通配符：
+
+- `?`: 可以表示不确定的类型，也可以进行类型的限定
+- `? extends E`: 表示可以传递E或者E所有的子类类型
+- `? super E`: 表示可以传递E或者E所有的父类类型
+
+应用场景
+
+- 如果在定义类、方法、接口的时候：如果类型不确定，可以使用泛型
+- 如果类型不确定，但知道以后只能传递某个继承体系中的类型，可以使用通配符
+  - 关键点：通配符可以限定类型的范围
