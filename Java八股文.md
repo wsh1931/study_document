@@ -247,7 +247,7 @@ student2的teacher为： jack
 
 简而言之，`深拷贝把要复制的对象所引用的对象都复制了一遍。`
 
-******深拷贝实例**
+**深拷贝实例**
 
 ```java
 public class DeepCopy {
@@ -416,6 +416,8 @@ equals 方法是从 Object 类中继承的，默认的实现就是使用==
 
 ##### String buffer 和 String builder 区别
 
+* Spring 是不可变字符串，每对Spring进行操作后都会产生一个新的字符串对象。
+
 * StringBuffer 与 StringBuilder 中的方法和功能完全是等价的，
 
 * 只是 StringBuffer 中的方法大都采用了 synchronized 关键字进行修饰，因此是线程安全的，而 StringBuilder 没有这个修饰，可以被认为是线程不安全的。
@@ -424,10 +426,8 @@ equals 方法是从 Object 类中继承的，默认的实现就是使用==
 
 ##### final、finally、finalize
 
-* final：修饰符（关键字）有三种用法：修饰类、变量和方法。修饰类时，意味着它不能再派生出新的子类，即不能被继承，因此它和 abstract 是反义词。修饰变
-* 量时，该变量使用中不被改变，必须在声明时给定初值，在引用中只能读取不可修改，即为常量。修饰方法时，也同样只能使用，不能在子类中被重写。
-* finally：通常放在 try…catch 的后面构造最终执行代码块，这就意味着程序无论正
-* 常执行还是发生异常，这里的代码只要 JVM 不关闭都能执行，可以将释放外部资源的代码写在 finally 块中。
+* final：修饰符（关键字）有三种用法：修饰类、变量和方法。修饰类时，意味着它不能再派生出新的子类，即不能被继承，因此它和 abstract 是反义词。修饰变量时，该变量使用中不被改变，必须在声明时给定初值，在引用中只能读取不可修改，即为常量。修饰方法时，也同样只能使用，不能在子类中被重写。
+* finally：通常放在 try…catch 的后面构造最终执行代码块，这就意味着程序无论正常执行还是发生异常，这里的代码只要 JVM 不关闭都能执行，可以将释放外部资源的代码写在 finally 块中。
 * finalize：Object 类中定义的方法，Java 中允许使用 finalize() 方法在垃圾收集器将对象从内存中清除出去之前做必要的清理工作。这个方法是由垃圾收集器在销毁对象时调用的，通过重写 finalize() 方法可以整理系统资源或者执行其他清理工作。
 
 ##### Object 中有哪些方法
@@ -848,8 +848,6 @@ final Node<K,V>[] resize() {
 
 **线程安全性不同**：HashMap 是线程不安全的，HashTable 是线程安全的，其中的方法是Synchronized，在多线程并发的情况下，可以直接使用 HashTable，但是使用HashMap 时必须自己增加同步处理。
 
-**是否提供 contains 方法**：HashMap 只有 containsValue 和 containsKey 方法；HashTable 有 contains、containsKey 和 containsValue 三个方法，其中 contains 和 containsValue 方法功能相同。
-
 **key** **和** **value** **是否允许** **null** **值**：Hashtable 中，key 和 value 都不允许出现 null 值。HashMap 中，null 可以作为键，这样的键只有一个；可以有一个或多个键所对应的值为 null。
 
 **数组初始化和扩容机制**：HashTable 在不指定容量的情况下的默认容量为 11，而 HashMap 为 16，Hashtable 不要求底层数组的容量一定要为 2 的整数次幂，而 HashMap 则要求一定为 2 的整数次幂。Hashtable 扩容时，将容量变为原来的 2 倍加 1，而 HashMap 扩容时，将容量变为原来的 2 倍。
@@ -890,7 +888,7 @@ final Node<K,V>[] resize() {
 
 ##### 什么是 java 序列化，如何实现 java 序列化
 
-序列化是一种用来处理对象流的机制，所谓对象流也就是将对象的内容进行流
+序列化是一种用来处理对象流的机制，所谓对象 流也就是将对象的内容进行流
 
 化。可以对流化后的对象进行读写操作，也可将流化后的对象传输于网络之间。序列
 
@@ -898,7 +896,7 @@ final Node<K,V>[] resize() {
 
 **序列化的实现 ：**
 
- 将需要被序列化的类实现 Serializable 接 口 ， 该接口没有 需
+ 将需要被序列化的类实现 Serializable 接 口 ， 该接口没有需
 
 要 实 现 的 方 法 ， implements Serializable 只是为了标注该对象是可被序列化的，
 
