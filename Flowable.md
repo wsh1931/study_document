@@ -50,7 +50,7 @@
 
 
 
-### 常用操作
+### Flowable执行流程
 
 #### 部署流程定义
 
@@ -115,17 +115,141 @@ ProcessInstance processInstance =
   runtimeService.startProcessInstanceByKey("holidayRequest", variables);
 ```
 
+当流程实例启动时,将创建一个**执行**并放入开始事件中。从那里,这个*执行*沿着序列流到达经理审批的用户任务,并执行用户任务行为。这个行为将在数据库中创建一个任务,稍后可以通过查询找到。用户任务是一个*等待状态*,引擎将停止执行任何进一步的操作,返回 API 调用。
 
+#### 查询和完成任务
 
-#### TaskService
+在更现实的应用程序中,会有一个用户界面,员工和经理可以登录并查看他们的任务列表。通过这些列表,他们可以检查存储为*流程变量*的流程实例数据,并决定他们想对任务做什么。在这个例子中,将通过执行 API 调用来模拟任务列表,这些 API 调用通常会位于驱动 UI 的服务调用背后。
 
-和任务运行相关的服务 
+还没有为用户任务配置分配。希望第一个任务分配给"managers"组,第二个用户任务分配给原始的假期申请人。要做到这一点,在第一个任务中添加 *candidateGroups* 属性:
+
+```xml
+<userTask id="approveTask" name="Approve or reject request" flowable:candidateGroups="managers"/>
+```
+
+并在第二个任务中添加 *assignee* 属性,如下所示。请注意,我们这里没有使用像上面"managers"那样的静态值,而是使用基于流程变量的动态分配,这个流程变量是我们在启动流程实例时传递的:
+
+```xml
+<userTask id="holidayApprovedTask" name="Holiday approved" flowable:assignee="${employee}"/>
+```
+
+ 要获取实际的任务列表,我们通过 *TaskService* 创建一个 *TaskQuery*,并配置查询仅返回"managers"组的任务:
+
+```java
+TaskService taskService = processEngine.getTaskService();
+List<Task> tasks = taskService.createTaskQuery().taskCandidateGroup("managers").list();
+System.out.println("You have " + tasks.size() + " tasks:");
+for (int i=0; i<tasks.size(); i++) {
+  System.out.println((i+1) + ") " + tasks.get(i).getName());
+}
+```
+
+使用任务标识符,我们现在可以获取特定的流程实例变量并在屏幕上显示实际请求:
+
+```java
+System.out.println("Which task would you like to complete?");
+int taskIndex = Integer.valueOf(scanner.nextLine());
+Task task = tasks.get(taskIndex - 1);
+Map<String, Object> processVariables = taskService.getVariables(task.getId());
+System.out.println(processVariables.get("employee") + " wants " +
+    processVariables.get("nrOfHolidays") + " of holidays. Do you approve this?");
+```
+
+运行结果图
+
+![getting.started.console.logging3](images/getting.started.console.logging3.png)
+
+经理现在可以**完成任务**了。在现实中,这通常意味着用户提交了一个表单。然后表单中的数据作为*流程变量*传递。在这里,我们将通过在完成任务时传递一个带有"approved"变量的 map 来模拟这一点(名称很重要,因为它稍后会在序列流的条件中使用!):
+
+```java
+boolean approved = scanner.nextLine().toLowerCase().equals("y");
+variables = new HashMap<String, Object>();
+variables.put("approved", approved);
+taskService.complete(task.getId(), variables);
+```
+
+任务现在已完成,基于"approved"流程变量选择了离开排他网关的两条路径之一。
 
 * complete：当前节点任务完成，将任务推送至下一流程
+* approved：传入rejected则说明走审批图中下面的审批流程
 
-#### processEngine
+#### 编写 JavaDelegate
 
-流程引擎核心类
+拼图中还缺少最后一块:我们还没有实现当请求被批准时将执行的自动逻辑。在 BPMN 2.0 XML 中,这是一个**服务任务**,它看起来像上面这样:
+
+```java
+<serviceTask id="externalSystemCall" name="Enter holidays in external system"
+    flowable:class="org.flowable.CallExternalSystemDelegate"/>
+```
+
+在现实中,这个逻辑可以是任何东西,从使用 HTTP REST 调用服务,到执行对组织使用了几十年的系统的遗留代码调用。我们这里不会实现实际的逻辑,而只是简单地记录*处理*。
+
+创建一个新类(*File → New → Class* in Eclipse),填写 *org.flowable* 作为包名和 *CallExternalSystemDelegate* 作为类名。让该类实现 *org.flowable.engine.delegate.JavaDelegate* 接口并实现 *execute* 方法:
+
+```java
+package org.flowable;
+
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
+
+public class CallExternalSystemDelegate implements JavaDelegate {
+
+    public void execute(DelegateExecution execution) {
+        System.out.println("Calling the external system for employee "
+            + execution.getVariable("employee"));
+    }
+
+}
+```
+
+
+
+#### 使用历史数据
+
+选择使用 Flowable 这样的流程引擎的众多原因之一是,它会自动为所有流程实例存储**审计数据**或**历史数据**。这些数据允许创建丰富的报告,这些报告可以洞察组织的工作方式,瓶颈在哪里等。
+
+例如,假设我们想要显示我们到目前为止一直在执行的流程实例的持续时间。为此,我们从 *ProcessEngine* 获取 *HistoryService* 并创建一个*历史活动*查询。在下面的代码片段中,你可以看到我们添加了一些额外的过滤:
+
+- 仅查询特定流程实例的活动
+- 仅查询已完成的活动
+
+结果也按结束时间排序,这意味着我们将按执行顺序获取它们。
+
+```java
+HistoryService historyService = processEngine.getHistoryService();
+List<HistoricActivityInstance> activities =
+  historyService.createHistoricActivityInstanceQuery()
+   .processInstanceId(processInstance.getId())
+   .finished()
+   .orderByHistoricActivityInstanceEndTime().asc()
+   .list();
+
+for (HistoricActivityInstance activity : activities) {
+  System.out.println(activity.getActivityId() + " took "
+    + activity.getDurationInMillis() + " milliseconds");
+}
+```
+
+运行结果
+
+```java
+startEvent took 1 milliseconds
+approveTask took 2638 milliseconds
+decision took 3 milliseconds
+externalSystemCall took 1 milliseconds
+```
+
+### 事务性
+
+整个审批流都属于同一个事务
+
+在 Flowable 中,数据库事务在保证数据一致性和解决并发问题方面起着关键作用。当你进行 Flowable API 调用时,默认情况下,所有操作都是同步的,并且属于同一个事务。这意味着,当方法调用返回时,事务将被启动并提交。
+
+当启动流程实例时,从流程实例的开始到下一个*等待状态*将有**一个数据库事务**。在这个例子中,这是第一个用户任务。当引擎到达这个用户任务时,状态被持久化到数据库中,事务被提交,API 调用返回。
+
+在 Flowable 中,当继续一个流程实例时,将始终有一个数据库事务从前一个*等待状态*到下一个*等待状态*。一旦持久化,数据可以在数据库中保存很长时间,如果需要的话甚至可以保存数年,直到执行 API 调用使流程实例继续前进。请注意,当流程实例处于这样的等待状态时,等待下一个 API 调用,不会消耗任何计算或内存资源。
+
+在这个例子中,当第一个用户任务完成时,将使用一个数据库事务从用户任务通过排他网关(自动逻辑)到达第二个用户任务。或者通过另一条路径直接到达结束。
 
 ### 芋道工作流使用方法
 
