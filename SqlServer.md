@@ -375,7 +375,7 @@ values(1,2,'太史慈','男','1983-6-1',7500,'13077778888','上海',getdate())
 
 其中DepartmentId，RankId，PeopleSalary均为数字类型，在赋值的时候不需要添加单引号，而其它类型需要添加单引号。
 
-## 四、查询数据是否插入成功
+## 四、查询数据是否插入成功 
 
 ```sql
 select * from Department
