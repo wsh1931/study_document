@@ -1011,6 +1011,1287 @@ Select CONVERT(varchar(20),GETDATE(),14)          --15:05:49:330
 | 秒           | second      | ss,s      |
 | 毫秒         | millisecond | ms        |
 
+# 分组查询
+
+（1）根据员工所在地区分组统计员工人数 ,员工工资总和 ,平均工资，最高工资和最低工资
+
+```sql
+--方案一：使用union(此方案需要知道所有的地区，分别查询出所有地区的数据，然后使用union拼接起来。)
+select '武汉' 地区,COUNT(*) 数量,MAX(PeopleSalary) 最高工资,MIN(PeopleSalary) 最低工资
+,SUM(PeopleSalary) 工资总和,AVG(PeopleSalary) 平均工资 from People
+ where PeopleAddress = '武汉' union
+select '北京' 地区,COUNT(*) 数量,MAX(PeopleSalary) 最高工资,MIN(PeopleSalary) 最低工资
+,SUM(PeopleSalary) 工资总和,AVG(PeopleSalary) 平均工资 from People
+ where PeopleAddress = '北京'
+ --...其它地区数据
+ --...其他地区数据
+ 
+ --方案二：使用Group by
+select PeopleAddress 地区,COUNT(*) 人数,SUM(PeopleSalary) 工资总和,
+AVG(PeopleSalary) 平均工资,MAX(PeopleSalary) 最高工资,MIN(PeopleSalary) 最低工资 
+from People group by PeopleAddress
+```
+
+（2）根据员工所在地区分组统计员工人数，员工工资总和，平均工资，最高工资和最低工资，1985 年及以后出身的员工不参与统计。
+
+```sql
+select PeopleAddress 地区,COUNT(*) 人数,SUM(PeopleSalary) 工资总和,
+AVG(PeopleSalary) 平均工资,MAX(PeopleSalary) 最高工资,MIN(PeopleSalary) 最低工资 
+from People
+where PeopleBirth < '1985-1-1'
+group by PeopleAddress
+```
+
+（3）根据员工所在地区分组统计员工人数，员工工资总和，平均工资，最高工资和最低工资，要求筛选出员工人数至少在2人及以上的记录，并且1985年及以后出身的员工不参与统计。
+
+```sql
+select PeopleAddress 地区,COUNT(*) 人数,SUM(PeopleSalary) 工资总和,
+AVG(PeopleSalary) 平均工资,MAX(PeopleSalary) 最高工资,MIN(PeopleSalary) 最低工资 
+from People 
+where PeopleBirth < '1985-1-1'
+group by PeopleAddress
+having COUNT(*) >= 2
+```
+
+# 多表查询
+
+## 一、笛卡尔乘积
+
+```sql
+select * from People,Department
+```
+
+此查询结果会将People表的所有数据和Department表的所有数据进行依次排列组合形成新的记录。例如People表有10条记录，Department表有3条记录，则排列组合之后查询结果会有10*3=30条记录。
+
+## 二、简单多表查询
+
+此种查询不符合主外建关系的数据不会被显示
+
+**查询员工信息，同时显示部门名称**
+
+```sql
+select * from People,Department where People.DepartmentId = Department.DepartmentId 
+```
+
+**查询员工信息，同时显示职级名称**
+
+```sql
+select * from People,Rank where People.RankId = Rank.RankId
+```
+
+**查询员工信息，同时显示部门名称，职位名称**
+
+```sql
+select * from People,Department,Rank
+where People.DepartmentId = Department.DepartmentId and People.RankId = Rank.RankId
+```
+
+## 三、内连接
+
+此种查询不符合主外建关系的数据不会被显示
+
+**查询员工信息，同时显示部门名称**
+
+```sql
+select * from People inner join Department on People.DepartmentId = Department.DepartmentId 
+```
+
+**查询员工信息，同时显示职级名称**
+
+```sql
+select * from People inner join Rank on People.RankId = Rank.RankId
+```
+
+**查询员工信息，同时显示部门名称，职位名称**
+
+```sql
+select * from People 
+inner join Department on People.DepartmentId = Department.DepartmentId 
+inner join Rank on People.RankId = Rank.RankId
+```
+
+## 三、外连接
+
+外连接分为左外连接、右外连接和全外连接。
+
+左外联接：以左表为主表显示全部数据，主外键关系找不到数据的地方null取代。
+
+**以下是左外连接的语法示例：**
+
+**查询员工信息，同时显示部门名称**
+
+```sql
+select * from People left join Department on People.DepartmentId = Department.DepartmentId 
+```
+
+**查询员工信息，同时显示职级名称**
+
+```sql
+select * from People left join Rank on People.RankId = Rank.RankId
+```
+
+**查询员工信息，同时显示部门名称，职位名称**
+
+```sql
+select * from People 
+left join Department on People.DepartmentId = Department.DepartmentId 
+left join Rank on People.RankId = Rank.RankId
+```
+
+右外连接（right join）：右外连接和左外连接类似，A left join B  ==  B right join A
+
+全外连接（full join）：两张表的所有数据无论是否符合主外键关系必须全部显示，不符合主外键关系的地方null取代。
+
+## 四、多表查询综合示例
+
+（1）查询出武汉地区所有的员工信息，要求显示部门名称以及员工的详细资料
+
+```sql
+select PeopleName 姓名,People.DepartmentId 部门编号 ,DepartmentName 部门名称,
+PeopleSex 性别,PeopleBirth 生日,
+PeopleSalary 月薪,PeoplePhone 电话,PeopleAddress 地区
+from People left join DEPARTMENT on Department.DepartmentId = People.DepartmentId
+where PeopleAddress = '武汉'
+```
+
+（2）查询出武汉地区所有的员工信息，要求显示部门名称，职级名称以及员工的详细资料
+
+```sql
+select PeopleName 姓名,DepartmentName 部门名称,RankName 职位名称,
+PeopleSex 性别,PeopleBirth 生日,
+PeopleSalary 月薪,PeoplePhone 电话,PeopleAddress 地区
+from People left join DEPARTMENT on Department.DepartmentId = People.DepartmentId
+left join [Rank] on [Rank].RankId = People.RankId
+where PeopleAddress = '武汉'
+```
+
+（3）根据部门分组统计员工人数，员工工资总和，平均工资，最高工资和最低工资。
+
+```sql
+--提示：在进行分组统计查询的时候添加二表联合查询。
+select DepartmentName 部门名称,COUNT(*) 人数,SUM(PeopleSalary) 工资总和,
+AVG(PeopleSalary) 平均工资,MAX(PeopleSalary) 最高工资,MIN(PeopleSalary) 最低工资 
+from People left join DEPARTMENT on Department.DepartmentId = People.DepartmentId
+group by Department.DepartmentId,DepartmentName
+```
+
+（4）根据部门分组统计员工人数，员工工资总和，平均工资，最高工资和最低工资，平均工资在10000 以下的不参与统计，并且根据平均工资降序排列。
+
+```sql
+select DepartmentName 部门名称,COUNT(*) 人数,SUM(PeopleSalary) 工资总和,
+AVG(PeopleSalary) 平均工资,MAX(PeopleSalary) 最高工资,MIN(PeopleSalary) 最低工资 
+from People left join DEPARTMENT on Department.DepartmentId = People.DepartmentId
+group by Department.DepartmentId,DepartmentName
+having AVG(PeopleSalary) >= 10000
+order by AVG(PeopleSalary) desc
+```
+
+（5）根据部门名称，然后根据职位名称，分组统计员工人数，员工工资总和，平均工资，最高工资和最低工资
+
+```sql
+select DepartmentName 部门名称,RANKNAME 职级名称,COUNT(*) 人数,SUM(PeopleSalary) 工资总和,
+AVG(PeopleSalary) 平均工资,MAX(PeopleSalary) 最高工资,MIN(PeopleSalary) 最低工资 
+from People 
+LEFT JOIN DEPARTMENT on Department.DepartmentId = People.DepartmentId
+LEFT JOIN [Rank] on [Rank].RANKID = People.RANKID
+group by Department.DepartmentId,DepartmentName,[Rank].RANKID,RANKNAME
+```
+
+## 五、自连接
+
+自连接：自己连接自己。
+
+例如有如下结构和数据：
+
+```sql
+create table Dept
+(
+	DeptId int primary key,  --部门编号
+	DeptName varchar(50) not null, --部门名称
+	ParentId int not null,  --上级部门编号
+)
+insert into Dept(DeptId,DeptName,ParentId)
+values(1,'软件部',0)
+insert into Dept(DeptId,DeptName,ParentId)
+values(2,'硬件部',0)
+
+insert into Dept(DeptId,DeptName,ParentId)
+values(3,'软件研发部',1)
+insert into Dept(DeptId,DeptName,ParentId)
+values(4,'软件测试部',1)
+insert into Dept(DeptId,DeptName,ParentId)
+values(5,'软件实施部',1)
+
+insert into Dept(DeptId,DeptName,ParentId)
+values(6,'硬件研发部',2)
+insert into Dept(DeptId,DeptName,ParentId)
+values(7,'硬件测试部',2)
+insert into Dept(DeptId,DeptName,ParentId)
+values(8,'硬件实施部',2)
+```
+
+如果要查询出所有部门信息，并且查询出自己的上级部门，查询结果如下：
+
+```sql
+--部门编号      部门名称     上级部门
+-- 3           软件研发部     软件部
+-- 4           软件测试部     软件部
+-- 5           软件实施部     软件部
+-- 6           硬件研发部     硬件部
+-- 7           硬件测试部     硬件部
+-- 8           硬件实施部     硬件部
+
+select A.DeptId 部门编号,A.DeptName 部门名称,B.DeptName 上级名称 from Dept A 
+inner join Dept B on A.ParentId = B.DeptId
+```
+
+# 数据库设计
+
+## 一、数据库结构设计三范式
+
+**第一范式：**是对属性的原子性，要求属性具有原子性，不可再分解。
+
+如有如下表结构设计：
+
+```sql
+create table Student --学生表
+(
+	StuId varchar(20) primary key,--学号
+	StuName varchar(20) not null,--学生姓名
+	StuContact varchar(50) not null, --联系方式
+)
+insert into Student(StuId,StuName,StuContact) 
+values('001','刘备','QQ:185699887;Tel:13885874587')
+select * from Student
+```
+
+上述设计则不满足第一范式，联系方式这一列并不是不可再分的最小单元,应修改为如下结构
+
+```sql
+create table Student --学生表
+(
+	StuId varchar(20) primary key,--学号
+	StuName varchar(20) not null,--学生姓名
+  	Tel varchar(20) not null, --联系电话
+  	QQ varchar(20) not null,  --联系QQ
+)
+```
+
+**第二范式：**是对记录的惟一性，要求记录有惟一标识，即实体的惟一性，即不存在部分依赖；
+
+如有如下表结构设计：
+
+```sql
+--选课成绩表
+create table StudentCourse
+(
+	StuId varchar(20),--学号
+	StuName varchar(20) not null,--学生姓名
+	CourseId varchar(20) not null,--课程编号
+	CourseName varchar(20) not null, --选课课程名称
+	CourseScore int not null, --考试成绩
+)
+insert into StudentCourse(StuId,StuName,CourseId,CourseName,CourseScore)
+values('001','刘备','001','语文',80)
+insert into StudentCourse(StuId,StuName,CourseId,CourseName,CourseScore)
+values('001','刘备','002','数学',70)
+insert into StudentCourse(StuId,StuName,CourseId,CourseName,CourseScore)
+values('002','关羽','003','英语',80)
+insert into StudentCourse(StuId,StuName,CourseId,CourseName,CourseScore)
+values('003','张飞','003','英语',90)
+```
+
+上述设计中有两个事物，一个学生信息，一个课程信息，很显然这两个事物都没有保证实体的唯一性，这里的姓名依赖学号，课程名称依赖课程编号，所以不符合二范式。
+
+```sql
+create table Course --课程
+(
+	CourseId int primary key identity(1,1),--课程编号
+	CourseName varchar(30) not null, --课程名称
+	CourseContent text --课程介绍
+)
+insert into Course(CourseName,CourseContent) values('HTML','静态网页的制作')
+insert into Course(CourseName,CourseContent) values('WinForm','Windows应用程序开发')
+
+create table Student --学生
+(
+	StuId int primary key identity(1,1), --学生编号
+	StuName varchar(50) not null, --学生名字
+	StuSex char(2) not null --学生性别
+)
+insert into Student(StuName,StuSex) values('刘备','男')
+insert into Student(StuName,StuSex) values('关羽','男')
+
+create Table Exam --考试信息表
+(
+	ExamId int primary key identity(1,1), --选课成绩编号
+	StuId int not null, --学生编号
+	CourseId int not null,  --课程编号
+	Score int not null, --考试分数
+)
+insert into Exam(StuId,CourseId,Score) values(1,1,90)
+insert into Exam(StuId,CourseId,Score) values(1,2,80)
+insert into Exam(StuId,CourseId,Score) values(2,2,85)
+
+select * from Student inner join Exam on Student.StuId = Exam.StuId
+inner join Course on Course.CourseId = Exam.CourseId
+```
+
+**第三范式：**要求任何字段不能由其他字段派生出来，它要求字段没有冗余，即不存在传递依赖 ；
+
+如有如下表结构设计：
+
+```sql
+create table Student
+(
+	StuId varchar(20) primary key,--学号
+	StuName varchar(20) not null,--学生姓名
+	ProfessionalId int not null,--专业编号
+	ProfessionalName varchar(50),--专业名称
+	ProfessionalRemark varchar(200), --专业介绍
+)
+insert into Student(StuId,StuName,ProfessionalId,ProfessionalName,ProfessionalRemark)
+values('001','刘备',1,'计算机','最牛的专业')
+insert into Student(StuId,StuName,ProfessionalId,ProfessionalName,ProfessionalRemark)
+values('002','关羽',2,'工商管理','管理学的基础专业')
+insert into Student(StuId,StuName,ProfessionalId,ProfessionalName,ProfessionalRemark)
+values('003','张飞',1,'计算机','最牛的专业')
+select * from Student
+```
+
+上述设计种专业名称字段和专业介绍字段，在数据库种会产生很多冗余数据，不满足第二范式，优化方案如下：
+
+```sql
+create table Professional
+(
+	ProfessionalId int primary key identity(1,1),--专业编号
+	ProfessionalName varchar(50),--专业名称
+	ProfessionalRemark varchar(200), --专业介绍
+)
+create table Student
+(
+	StuId varchar(20) primary key,--学号
+	StuName varchar(20) not null,--学生姓名
+	ProfessionalId int not null,--专业编号
+)
+insert into Professional(ProfessionalName,ProfessionalRemark) values('计算机','最牛的专业')
+insert into Professional(ProfessionalName,ProfessionalRemark) values('工商管理','管理学的基础专业')
+insert into Student(StuId,StuName,ProfessionalId) values('001','刘备',1)
+insert into Student(StuId,StuName,ProfessionalId) values('002','关羽',2)
+insert into Student(StuId,StuName,ProfessionalId) values('003','张飞',1)
+select * from Student
+```
+
+## 二、表关系
+
+**（1）一对多关系（专业--学生）**
+
+```sql
+create table Profession  --专业
+(
+	ProId int primary key identity(1,1), --专业编号
+	ProName varchar(50) not null --专业名称
+)
+create table Student --学生
+(
+	StuId int primary key identity(1,1), --学生编号
+	ProId int references Profession(ProId),
+	StuName varchar(50) not null, --学生名字
+	StuSex char(2) not null --学生性别
+)
+insert into Profession(ProName) values('软件开发')
+insert into Profession(ProName) values('企业信息化')
+insert into Student(ProId,StuName,StuSex) values(1,'刘备','男')
+insert into Student(ProId,StuName,StuSex) values(1,'关羽','男')
+insert into Student(ProId,StuName,StuSex) values(2,'张飞','男')
+insert into Student(ProId,StuName,StuSex) values(2,'赵云','男')
+select * from Student left join Profession on Student.ProId = Profession.ProId
+```
+
+**（2）一对一关系（学生基本信息--学生详情）**
+
+**方案一：**
+
+```sql
+create table StudentBasicInfo  --学生基本信息
+(
+	StuNo varchar(20) primary key not null,  --学号
+	StuName varchar(20) not null, --姓名
+	StuSex nvarchar(1) not null  --性别
+)
+create table StudentDetailInfo  --学生详细信息
+(
+	StuNo varchar(20) primary key not null,
+	StuQQ varchar(20), --QQ
+	stuPhone varchar(20), --电话
+	StuMail varchar(100), --邮箱
+	StuBirth date         --生日
+)
+--插入数据的时候按照顺序先插入刘备的基本信息，在插入关羽的基本信息
+--insert into StudentBasicInfo(StuNo,StuName,StuSex) values('QH001','刘备','男')
+--insert into StudentBasicInfo(StuNo,StuName,StuSex) values('QH002','关羽','男')
+--插入数据的时候按照顺序先插入关羽的详细信息，在插入刘备的详细信息
+--insert into StudentDetailInfo(StuNo,StuQQ,stuPhone,StuMail,StuBirth)
+--values('QH002','156545214','13654525478','guanyu@163.com','1996-6-6')
+--insert into StudentDetailInfo(StuNo,StuQQ,stuPhone,StuMail,StuBirth)
+--values('QH001','186587854','15326545214','liubei@163.com','1998-8-8')
+
+--或者如下结构也行：
+create table StudentBasicInfo  --学生基本信息
+(
+	StuNo int primary key identity(1,1),  --学号
+	StuName varchar(20) not null, --姓名
+	StuSex nvarchar(1) not null  --性别
+)
+create table StudentDetailInfo  --学生详细信息
+(
+	StuNo int primary key,  --学号
+	StuQQ varchar(20), --QQ
+	stuPhone varchar(20), --电话
+	StuMail varchar(100), --邮箱
+	StuBirth date         --生日
+)
+```
+
+此方案要求两个表的主键相等关系确定一个学生，所以此设计必须保证主键是可以维护和编辑的，如果主键是自动增长，将很大程度增加了数据维护的难度。
+
+**方案二：**
+
+```sql
+create table StudentBasicInfo  --学生基本信息
+(
+	StuNo int primary key identity(1,1),  --学号
+	StuName varchar(20) not null, --姓名
+	StuSex nvarchar(1) not null  --性别
+)
+create table StudentDetailInfo  --学生详细信息
+(
+	StuDetailNo int primary key identity(1,1),  --详细信息编号
+	StuNo int references StudentBasicInfo(StuNo) --学号,外键
+	StuQQ varchar(20), --QQ
+	stuPhone varchar(20), --电话
+	StuMail varchar(100), --邮箱
+	StuBirth date         --生日
+)
+```
+
+此方案中实际上我们是使用一对多的模式来表示一对一，保证多的表中只有一条对应数据即可。
+
+**（3）多对多关系：（选课成绩--学生）**
+
+```sql
+create table Course --课程
+(
+	CourseId int primary key identity(1,1),--课程编号
+	CourseName varchar(30) not null, --课程名称
+	CourseContent text --课程介绍
+)
+insert into Course(CourseName,CourseContent) values('HTML','静态网页的制作')
+insert into Course(CourseName,CourseContent) values('WinForm','Windows应用程序开发')
+
+create table Student --学生
+(
+	StuId int primary key identity(1,1), --学生编号
+	StuName varchar(50) not null, --学生名字
+	StuSex char(2) not null --学生性别
+)
+insert into Student(StuName,StuSex) values('刘备','男')
+insert into Student(StuName,StuSex) values('关羽','男')
+
+create Table Exam --考试信息表
+(
+	ExamId int primary key identity(1,1), --选课成绩编号
+	StuId int not null, --学生编号
+	CourseId int not null,  --课程编号
+	Score int not null, --考试分数
+)
+insert into Exam(StuId,CourseId,Score) values(1,1,90)
+insert into Exam(StuId,CourseId,Score) values(1,2,80)
+insert into Exam(StuId,CourseId,Score) values(2,2,85)
+
+select * from Student inner join Exam on Student.StuId = Exam.StuId
+inner join Course on Course.CourseId = Exam.CourseId
+```
+
+此方案中，一个学生可以有多门选课，一门课程也可以被多个学生选择，我们称之为多对多关系，在处理多对多关系的时候，我们需要建立一个中间关联表，该关联表中需要有另外两张表的主键字段。
+
+# 使用T-SQL编程
+
+## 一、信息打印
+
+```sql
+print:直接打印消息
+select:在表格中打印消息，可以设置多列，以及每一列的名字
+```
+
+## 二、变量
+
+**T-SQL中变量分为局部变量和全局变量**
+
+**局部变量：（1）以@作为前缀（2）先声明，在赋值**
+
+```sql
+declare @str varchar(20)
+set @str = '我爱数据库编程' --或者 select @str = '我爱数据库编程'
+print @str
+```
+
+备注：set赋值和select赋值区别：
+
+set：赋给变量指定的值
+
+select：一般用于从表中查询出的数据，查询记录如果有多条，将最后一条记录的值赋给变量，例如：
+
+```sql
+select @变量名 = 字段名 from 表名
+```
+
+在赋值过程中，如果是表中查询的数据，如果记录只有一条，使用set和select都可以，但是习惯上使用select。
+
+**全局变量：（1）以@@作为前缀（2）由系统进行定义和维护,只读**
+
+```sql
+@@ERROR：返回执行的上一个语句的错误号
+@@IDENTITY：返回最后插入的标识值
+@@MAX_CONNECTIONS：返回允许同时进行的最大用户连接数
+@@ROWCOUNT：返回受上一语句影响的行数
+@@SERVERNAME：返回运行 SQL Server 的本地服务器的名称
+@@SERVICENAME：返回 SQL Server 正在其下运行的注册表项的名称
+@@TRANCOUNT：返回当前连接的活动事务数
+@@LOCK_TIMEOUT：返回当前会话的当前锁定超时设置（毫秒）
+@@IDENTITY：返回当前会话中最后一次执行 INSERT 操作时自动生成的标识列（自增列）的值
+```
+
+**变量示例：**
+
+（1）为赵云此人进行开户开卡操作，赵云身份证：420107199904054233
+
+```sql
+declare @AccountId int
+insert into AccountInfo(AccountCode,AccountPhone,RealName,OpenTime)
+values('420107199904054233','15878547898','赵云',GETDATE())
+set @AccountId = @@identity
+insert into BankCard(CardNo,AccountId,CardPwd,CardMoney,CardState)
+values('6225123412357896',@AccountId,'123456',0,1)
+```
+
+（2）需要求出张飞的银行卡卡号和余额，张飞身份证：420107199602034138
+
+```sql
+-- 方案一：连接查询
+select CardNo 卡号, CardMoney 余额 from BankCard 
+left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+where AccountCode = '420107199602034138'
+-- 方案二：使用变量
+declare @AccountId int
+select @AccountId =  (select AccountId from AccountInfo where AccountCode = '420107199602034138')
+select CardNo 卡号, CardMoney 余额 from BankCard where BankCard.AccountId = @AccountId
+```
+
+## 三、go语句
+
+go语句：
+
+（1）等待go语句前的代码执行完成后，再执行go后面的代码。
+
+（2）批处理语句的结束标志。
+
+```sql
+-- 下面的@num变量作用域为全局
+--declare @num int
+--set @num = 0
+
+-- 下面的@num变量的作用域是局部，只在两个go之间可以使用，最后一行代码会报错
+--.........sql代码
+--go
+--declare @num int
+--set @num = 0
+--go
+--set @num = 1
+```
+
+**添加测试数据：**
+
+```sql
+-- 为刘备，关羽，张飞三个人进行开户开卡的操作
+-- 刘备身份证：420107198905064135
+-- 关羽身份证：420107199507104133
+-- 张飞身份证：420107199602034138
+insert into AccountInfo(AccountCode,AccountPhone,RealName,OpenTime)
+values('420107198905064135','13554785425','刘备',GETDATE())
+insert into BankCard(CardNo,AccountId,CardPwd,CardMoney,CardState)
+values('6225125478544587',1,'123456',0,1)
+
+insert into AccountInfo(AccountCode,AccountPhone,RealName,OpenTime)
+values('420107199507104133','13454788854','关羽',GETDATE())
+insert into BankCard(CardNo,AccountId,CardPwd,CardMoney,CardState)
+values('6225547858741263',2,'123456',0,1)
+
+insert into AccountInfo(AccountCode,AccountPhone,RealName,OpenTime)
+values('420107199602034138','13456896321','张飞',GETDATE())
+insert into BankCard(CardNo,AccountId,CardPwd,CardMoney,CardState)
+values('6225547854125656',3,'123456',0,1)
+
+select * from AccountInfo
+select * from BankCard
+
+--进行存钱操作，刘备存钱2000元，关羽存钱：8000元，张飞存钱：500000元
+select * from AccountInfo
+update BankCard set CardMoney = CardMoney + 2000 where CardNo = '6225125478544587'
+insert into CardExchange(CardNo,MoneyInBank,MoneyOutBank,ExchangeTime)
+values('6225125478544587',2000,0,GETDATE())
+
+update BankCard set CardMoney = CardMoney + 8000 where CardNo = '6225547858741263'
+insert into CardExchange(CardNo,MoneyInBank,MoneyOutBank,ExchangeTime)
+values('6225547858741263',8000,0,GETDATE())
+
+update BankCard set CardMoney = CardMoney + 500000 where CardNo = '6225547854125656'
+insert into CardExchange(CardNo,MoneyInBank,MoneyOutBank,ExchangeTime)
+values('6225547854125656',500000,0,GETDATE())
+
+--转账：刘备给张飞转账1000元
+update BankCard set CardMoney = CardMoney -1000 where CardNo = '6225125478544587'
+update BankCard set CardMoney = CardMoney + 1000 where CardNo = '6225547854125656'
+insert into CardTransfer(CardNoOut,CardNoIn,TransferMoney,TransferTime)
+values('6225125478544587','6225547854125656',1000,GETDATE())
+```
+
+# 运算符
+
+T-SQL中使用的运算符分为7种
+
+```sql
+算数运算符：加（+）、减（-）、乘（*）、除（/）、模（%） 
+逻辑运算符：AND、OR、LIKE、BETWEEN、IN、EXISTS、NOT、ALL、ANY、 
+赋值运算符：= 
+字符串运算符：+ 
+比较运算符：=、>、<、>=、<=、<> 
+位运算符：|、&、^ 
+复合运算符：+=、-=、/=、%=、*=
+```
+
+## 运算符示例
+
+（1）已知长方形的长和宽，求长方形的周长和面积
+
+```sql
+declare @c int = 5
+declare @k int = 10
+declare @zc int
+declare @mj int
+set @zc = (@c+@k)*2
+set @mj = @c * @k
+print '周长为:' + Convert(varchar(20),@zc)
+print '面积为:' + Convert(varchar(20),@mj)
+```
+
+（2）查询银行卡状态为冻结，并且余额超过1000000的银行卡信息
+
+```sql
+select * from BankCard where CardState = 3 and CardMoney > 1000000
+```
+
+（3）查询出银行卡状态为冻结或者余额等于0的银行卡信息
+
+```sql
+select * from BankCard where CardState = 3 or CardMoney = 0
+```
+
+（4）查询出姓名中含有'刘'的账户信息以及银行卡信息
+
+```sql
+select * from AccountInfo left join BankCard on AccountInfo.AccountId = BankCard.AccountId where RealName like '%刘%'
+```
+
+（5）查询出余额在2000-5000之间的银行卡信息
+
+```sql
+select * from BankCard where CardMoney between 2000 and 5000
+```
+
+（6）查询出银行卡状态为冻结或者注销的银行卡信息
+
+```sql
+select * from BankCard where CardState in(3,4)
+```
+
+（7）关羽身份证：420107199507104133，关羽到银行来开户，查询身份证在账户表是否存在，不存在则进行开户开卡，存在则不开户直接开卡。
+
+```sql
+declare @AccountId int
+if exists(select * from AccountInfo where AccountCode = '420107199507104133')
+	begin		
+		select @AccountId = (select AccountId from AccountInfo where AccountCode = '420107199507104133')
+		insert into BankCard(CardNo,AccountId,CardPwd,CardMoney,CardState)
+		values('6225456875357896',@AccountId,'123456',0,1)				
+	end
+else
+	begin
+		insert into AccountInfo(AccountCode,AccountPhone,RealName,OpenTime)
+		values('420107199507104133','13335645213','关羽',GETDATE())
+		set @AccountId = @@identity
+		insert into BankCard(CardNo,AccountId,CardPwd,CardMoney,CardState)
+		values('6225456875357896',@AccountId,'123456',0,1)		
+	end
+```
+
+上述代码也可以使用not exists进行判断，表示不存在。
+
+扩展：上面需求添加一个限制即一个人最多只能开3张银行卡。
+
+```sql
+declare @AccountId int
+declare @count int
+if exists(select * from AccountInfo where AccountCode = '420107199507104133')
+	begin		
+		select @AccountId = (select AccountId from AccountInfo where AccountCode = '420107199507104133')
+		select @count = (select COUNT(*) from BankCard where AccountId = @AccountId)
+		if @count <= 2
+            begin
+                insert into BankCard(CardNo,AccountId,CardPwd,CardMoney,CardState)
+                values('6225456875357898',@AccountId,'123456',0,1)	
+            end	
+		else
+            begin
+                print '一个人最多只能办理三张银行卡'
+            end		
+	end
+else
+	begin
+		insert into AccountInfo(AccountCode,AccountPhone,RealName,OpenTime)
+		values('420107199507104133','13335645213','关羽',GETDATE())
+		set @AccountId = @@identity
+		insert into BankCard(CardNo,AccountId,CardPwd,CardMoney,CardState)
+		values('6225456875357898',@AccountId,'123456',0,1)		
+	end
+```
+
+（8）查询银行卡账户余额，是不是所有的账户余额都超过了3000。
+
+```sql
+if 3000 < ALL(select CardMoney from BankCard) 
+	print '所有账户余额都超过了3000'
+else
+	print '存在有余额不超过3000的账户'
+```
+
+（9）查询银行卡账户余额，是否含有账户余额超过30000000的信息
+
+```sql
+if 30000000 < ANY(select CardMoney from BankCard) 
+	print '存在账户余额超过30000000的账户'
+else
+	print '不存在账户余额超过30000000的账户'
+```
+
+# 流程控制
+
+## 一、选择分之结构
+
+（1）某用户银行卡号为“6225547854125656”，该用户执行取钱操作，取钱5000元，余额充足则进行取钱操作，并提示"取钱成功"，否则提示“余额不足”。
+
+```sql
+declare @balance money
+select @balance = (select CardMoney from BankCard where CardNo='6225547854125656')
+if @balance >= 5000
+	begin
+		update BankCard set CardMoney = CardMoney - 5000
+		insert into CardExchange(CardNo,MoneyInBank,MoneyOutBank,ExchangeTime)
+		values('6225547854125656',0,5000,GETDATE())
+	end
+else
+	print '余额不足'
+```
+
+（2）查询银行卡信息，将银行卡状态1,2,3,4分别转换为汉字“正常,挂失,冻结,注销”，并且根据银行卡余额显示银行卡等级 30万以下为“普通用户”,30万及以上为"VIP用户"，显示列分别为卡号，身份证，姓名，余额，用户等级，银行卡状态。
+
+```sql
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额,
+case
+	when CardMoney < 300000 then '普通用户'
+	else 'VIP用户' 
+end 用户等级,
+case
+	when CardState = 1 then '正常'
+	when CardState = 2 then '挂失'
+	when CardState = 3 then '冻结'
+	when CardState = 4 then '注销'
+	else '异常'
+end 卡状态
+from BankCard inner join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+```
+
+或如下写法：
+
+```sql
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额,
+case
+	when CardMoney < 300000 then '普通用户'
+	else 'VIP用户' 
+end 用户等级,
+case CardState
+	when 1 then '正常'
+	when 2 then '挂失'
+	when 3 then '冻结'
+	when 4 then '注销'
+	else '异常'
+end 卡状态
+from BankCard inner join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+```
+
+## 二、循环结构
+
+（1）循环打印1-10。
+
+```sql
+declare @i int  = 1
+while @i <= 10
+begin
+	print @i
+	set @i = @i + 1
+end
+```
+
+（2）循环打印九九乘法表
+
+```sql
+declare @i int = 1
+declare @str varchar(1000)
+while @i<=9
+begin
+	declare @j int = 1
+	set @str = ''
+	while @j <= @i
+	begin
+		-- 方案一
+		--set @str = @str + cast(@i as varchar(2)) + '*' + cast(@j as varchar(2)) + 
+		--'=' + cast(@i*@j as varchar(2)) + CHAR(9)
+		-- 方案二
+		set @str = @str + Convert(varchar(2),@i) + '*' + Convert(varchar(2),@j) + 
+		'=' + Convert(varchar(2),@i*@j) + CHAR(9)		
+		set @j = @j + 1
+	end
+	print @str
+	set @i = @i + 1
+end
+```
+
+备注：
+
+（1）特殊字符：制表符	CHAR(9)；换行符	CHAR(10)；回车	CHAR(13)；
+
+（2）循环中若出现break和CONTINUE,作用与Java，C#等语言一致。
+
+# 子查询
+
+（1）关羽的银行卡号为"6225547858741263"，查询出余额比关羽多的银行卡信息，显示卡号，身份证，姓名，余额。
+
+```sql
+--方案一：
+declare @gyBalance money
+select @gyBalance = (select CardMoney from BankCard where CardNo='6225547858741263')
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额 from BankCard 
+left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+where CardMoney > @gyBalance
+```
+
+```sql
+--方案二:
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额 from BankCard 
+left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+where CardMoney > 
+(select CardMoney from BankCard where CardNo='6225547858741263')
+```
+
+（2）从所有账户信息中查询出余额最高的交易明细(存钱取钱信息)。
+
+```sql
+--方案一：
+select * from CardExchange where CardNo in 
+(select CardNo from BankCard where CardMoney = 
+  (select MAX(CardMoney) from BankCard)
+)
+```
+
+```sql
+--方案二：（如果有多个银行卡余额相等并且最高，此方案只能求出其中一个人的明细）
+select * from CardExchange where CardNo = 
+(select top 1 CardNo from BankCard order by CardMoney desc)
+```
+
+（3）查询有取款记录的银行卡及账户信息，显示卡号，身份证，姓名，余额。
+
+```sql
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额 from BankCard 
+left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+where CardNo in
+(select CardNo from CardExchange where MoneyOutBank <> 0)
+```
+
+（4）查询出没有存款记录的银行卡及账户信息，显示卡号，身份证，姓名，余额。
+
+```sql
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额 from BankCard 
+left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+where CardNo not in
+(select CardNo from CardExchange where MoneyInBank <> 0)
+```
+
+（5）关羽的银行卡号为"6225547858741263",查询当天是否有收到转账。
+
+```sql
+if exists(select * from CardTransfer where CardNoIn = '6225547858741263'
+and convert(varchar(10),TransferTime, 120) = convert(varchar(10),getdate(), 120)
+)
+	print '有转账记录'
+else
+	print '没有转账记录'
+--备注：上述例子也可以使用not exists来实现，表示不不存在记录
+```
+
+（6）查询出交易次数（存款取款操作）最多的银行卡账户信息，显示：卡号，身份证，姓名，余额，交易次数。
+
+```sql
+--方案一
+select top 1 BankCard.CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额,
+exchangeCount 交易次数 from BankCard 
+inner join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+inner join
+(select CardNo,COUNT(*) exchangeCount from CardExchange group by CardNo) CarcExchageTemp
+on BankCard.CardNo = CarcExchageTemp.CardNo
+order by exchangeCount desc
+```
+
+```sql
+--方案二(如果有多个人交易次数相同，都是交易次数最多，则使用以下方案)
+select  BankCard.CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额,交易次数 
+from AccountInfo
+inner join BankCard on AccountInfo.AccountId = BankCard.AccountId
+inner join
+(select CardNo,COUNT(*) 交易次数 from CardExchange group by CardNo) Temp 
+on BankCard.CardNo = Temp.CardNo
+where 交易次数 = (select max(交易次数) from
+(select CardNo,COUNT(*) 交易次数 from CardExchange group by CardNo) Temp )
+```
+
+（7）查询出没有转账交易记录的银行卡账户信息，显示卡号，身份证，姓名，余额。
+
+```sql
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额 from BankCard 
+left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+where BankCard.CardNo not in (select CardNoIn from CardTransfer)
+and BankCard.CardNo not in (select CardNoOut from CardTransfer)
+```
+
+（8）分页。
+
+```sql
+--数据结构和数据如下：
+create table Student
+(
+	StuId int primary key identity(1,2), --自动编号
+	StuName varchar(20),
+	StuSex varchar(4)
+)
+insert into Student(StuName,StuSex) values('刘备','男')
+insert into Student(StuName,StuSex) values('关羽','男')
+insert into Student(StuName,StuSex) values('张飞','男')
+insert into Student(StuName,StuSex) values('赵云','男')
+insert into Student(StuName,StuSex) values('马超','男')
+insert into Student(StuName,StuSex) values('黄忠','男')
+insert into Student(StuName,StuSex) values('魏延','男')
+insert into Student(StuName,StuSex) values('简雍','男')
+insert into Student(StuName,StuSex) values('诸葛亮','男')
+insert into Student(StuName,StuSex) values('徐庶','男')
+insert into Student(StuName,StuSex) values('周仓','男')
+insert into Student(StuName,StuSex) values('关平','男')
+insert into Student(StuName,StuSex) values('张苞','男')
+insert into Student(StuName,StuSex) values('曹操','男')
+insert into Student(StuName,StuSex) values('曹仁','男')
+insert into Student(StuName,StuSex) values('曹丕','男')
+insert into Student(StuName,StuSex) values('曹植','男')
+insert into Student(StuName,StuSex) values('曹彰','男')
+insert into Student(StuName,StuSex) values('典韦','男')
+insert into Student(StuName,StuSex) values('许褚','男')
+insert into Student(StuName,StuSex) values('夏侯敦','男')
+insert into Student(StuName,StuSex) values('郭嘉','男')
+insert into Student(StuName,StuSex) values('荀彧','男')
+insert into Student(StuName,StuSex) values('贾诩','男')
+insert into Student(StuName,StuSex) values('孙权','男')
+insert into Student(StuName,StuSex) values('孙坚','男')
+insert into Student(StuName,StuSex) values('孙策','男')
+insert into Student(StuName,StuSex) values('太史慈','男')
+insert into Student(StuName,StuSex) values('大乔','女')
+insert into Student(StuName,StuSex) values('小乔','女')
+```
+
+```sql
+--  方案一：使用row_number分页
+declare @PageSize int = 5
+declare @PageIndex int = 1
+select * from (select ROW_NUMBER() over(order by StuId) RowId,Student.* from Student) TempStu
+where RowId between (@PageIndex-1)*@PageSize+1 and @PageIndex*@PageSize
+```
+
+```sql
+--  方案二：使用top分页
+declare @PageSize int = 5
+declare @PageIndex int = 1
+select top(@PageSize) * from Student
+where StuId not in (select top((@PageIndex-1)*@PageSize) StuId from Student)
+```
+
+# 事务-索引-视图-游标
+
+## 一、事务
+
+人员信息如下：（第二列是身份证号，第三列是银行卡卡号）
+
+--刘备  420107198905064135  6225125478544587
+--关羽  420107199507104133  6225547858741263
+--张飞  420107199602034138  6225547854125656
+
+（1）假设刘备取款6000，(添加check约束，设置账户余额必须>=0)，要求：使用事务实现，修改余额和添加取款记录两步操作使用事务
+
+```sql
+begin transaction
+declare @MyError int = 0
+update BankCard set CardMoney = CardMoney-6000 where CardNo = '6225125478544587'
+set @MyError = @MyError + @@ERROR
+insert into CardExchange(CardNo,MoneyInBank,MoneyOutBank,ExchangeTime)
+values('6225125478544587',0,6000,GETDATE())
+set @MyError = @MyError + @@ERROR
+if @MyError = 0
+begin
+	commit transaction
+	print '取款成功'
+end	
+else
+begin
+	rollback transaction
+	print '余额不足'
+end
+```
+
+（2）假设刘备向张飞转账1000元，(添加check约束，设置账户余额必须>=0)；分析步骤有三步（1）张飞添加1000元，（2）刘备扣除1000元，（3）生成转账记录；使用事务解决此问题。
+
+```sql
+begin transaction
+declare @Error int = 0
+update BankCard set CardMoney = CardMoney -1000 where CardNo = '6225125478544587'
+set @Error = @@ERROR + @Error
+update BankCard set CardMoney = CardMoney + 1000 where CardNo = '6225547854125656'
+set @Error = @@ERROR + @Error
+insert into CardTransfer(CardNoOut,CardNoIn,TransferMoney,TransferTime)
+values('6225125478544587','6225547854125656',1000,GETDATE())
+set @Error = @@ERROR + @Error
+if @Error = 0
+	begin
+		commit
+		print '转账成功'
+	end
+else
+	begin
+		rollback
+		print '转账失败'		
+	end
+```
+
+## 二、索引
+
+索引：提高检索查询效率。
+
+**SQL SERVER索引类型：**按存储结构区分：“聚集索引（又称聚类索引，簇集索引）”，“非聚集索引（非聚类索引，非簇集索引）”；
+
+聚集索引：根据数据行的键值在表或视图中的排序存储这些数据行，每个表只有一个聚集索引。聚集索引是一种对磁盘上实际数据重新组织以按指定的一列或多列值排序(类似字典中的拼音索引)(物理存储顺序)。
+
+非聚集索引：具有独立于数据行的结构，包含非聚集索引键值，且每个键值项都有指向包含该键值的数据行的指针。（类似字典中的偏旁部首索引）（逻辑存储顺序）。
+
+**SQL SERVER索引其他分类：**
+
+按数据唯一性区分：“唯一索引”，“非唯一索引”；按键列个数区分：“单列索引”，“多列索引”。
+
+**创建索引的方式：**
+
+1.  通过显式的CREATE INDEX命令 
+2.  在创建约束时作为隐含的对象 
+    1.  主键约束(聚集索引) 
+    2.  唯一约束(唯一索引) 
+
+**创建索引语法：**
+
+```
+CREATE [UNIQUE] [CLUSTERED | NONCLUSTERED]
+INDEX <index name> ON <table or view name>(<column name> [ASC|DESC][,...n])
+```
+
+**索引基本示例语法：**
+
+```
+--exp:创建一个非聚集索引
+--create nonclustered index indexAccount on AccountInfo(AccountCode)
+--删除一个索引
+--drop index indexAccount on AccountInfo
+```
+
+备注：索引信息存储在系统视图sys.indexes中。
+
+**按照指定索引进行查询**
+
+```
+select * from AccountInfo with(index=indexAccount) where AccountCode='6225125478544587'
+```
+
+## 三、视图
+
+视图：可以理解成虚拟表。
+
+（1）编写视图实现查询出所有银行卡账户信息，显示卡号，身份证，姓名，余额。
+
+```
+create view CardAndAccount as
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额 from BankCard 
+left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+go
+```
+
+如果要进行相应信息的查询，不需要编写复杂的SQL语句，直接使用视图，如下：
+
+```
+select * from CardAndAccount
+```
+
+## 四、游标
+
+游标：定位到结果集中某一行。
+
+游标分类：
+（1）静态游标(Static)：在操作游标的时候，数据发生变化，游标中数据不变
+（2）动态游标(Dynamic)：在操作游标的时候，数据发生变化，游标中数据改变，默认值。
+（3）键集驱动游标(KeySet)：在操作游标的时候，被标识的列发生改变，游标中数据改变，其他列改变，游标中数据不变。
+
+假设有如下表结构和数据：
+
+```
+create table Member
+(
+	MemberId int primary key identity(1,1),
+	MemberAccount nvarchar(20) unique check(len(MemberAccount) between 6 and 12),
+	MemberPwd nvarchar(20),
+	MemberNickname nvarchar(20),
+	MemberPhone nvarchar(20)
+)
+
+insert into Member(MemberAccount,MemberPwd,MemberNickname,MemberPhone)
+values('liubei','123456','刘备','4659874564')
+insert into Member(MemberAccount,MemberPwd,MemberNickname,MemberPhone)
+values('guanyu','123456','关羽','42354234124')
+insert into Member(MemberAccount,MemberPwd,MemberNickname,MemberPhone)
+values('zhangfei','123456','张飞','41253445')
+insert into Member(MemberAccount,MemberPwd,MemberNickname,MemberPhone)
+values('zhangyun','123456','赵云','75675676547')
+insert into Member(MemberAccount,MemberPwd,MemberNickname,MemberPhone)
+values('machao','123456','马超','532523523')
+```
+
+**创建游标：**
+
+```
+--1.创建游标(Scroll代表滚动游标，不加Scroll则是只进的，只能支持fetch next)
+declare CURSORMember cursor scroll 
+for select MemberAccount from Member
+```
+
+**打开游标：**
+
+```
+open  CURSORMember
+```
+
+**提取数据：**
+
+```
+fetch first from CURSORMember --结果集的第一行
+fetch last from CURSORMember  --最后一行
+fetch absolute 1 from CURSORMember --从游标的第一行开始数，第n行。
+fetch relative 3 from CURSORMember --从当前位置数，第n行。
+fetch next from CURSORMember --当前位置的下一行
+fetch prior from CURSORMember --当前位置的上一行
+```
+
+**提取数据给变量以供它用（取出第3行用户名，查询该用户详细信息）：**
+
+```
+declare @MemberAccount varchar(30)
+fetch absolute 3 from CURSORMember into @MemberAccount
+select * from Member where MemberAccount = @MemberAccount
+```
+
+**利用游标提取所有的账户信息：**
+
+```
+--方案一：
+fetch absolute 1 from CURSORMember
+while @@FETCH_STATUS = 0  --@@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+	begin
+		fetch next from CURSORMember
+	end
+	
+--方案二：
+declare @MemberAccount varchar(30)
+--fetch next from CURSORMember into @MemberAccount
+fetch absolute 1 from CURSORMember into @MemberAccount
+while @@FETCH_STATUS = 0  --@@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+	begin
+		print '提取成功:' + @MemberAccount
+		fetch next from CURSORMember into @MemberAccount
+	end
+```
+
+**利用游标修改和删除数据：**
+
+```
+fetch absolute 3 from CURSORMember
+update Member set MemberPwd = '1234567' where Current of CURSORMember
+
+fetch absolute 3 from CURSORMember
+delete Member where Current of CURSORMember
+```
+
+**关闭游标：**
+
+```
+close CURSORMember
+```
+
+**删除游标：**
+
+```
+deallocate CURSORMember
+```
+
+**创建游标指向某行多列数据,并循环显示数据：**
+
+```
+--此处如果指向所有数据，可以将for后面的语句修改成select * from Member
+declare CURSORMember cursor scroll
+for select MemberAccount,MemberPwd,MemberNickname,MemberPhone from Member
+
+open CURSORMember
+
+declare @MemberAccount varchar(30)
+declare	@MemberPwd nvarchar(20)
+declare	@MemberNickname nvarchar(20)
+declare	@MemberPhone nvarchar(20)
+fetch next from CURSORMember into @MemberAccount,@MemberPwd,@MemberNickname,@MemberPhone
+while @@FETCH_STATUS = 0  --@@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+	begin
+		print '提取成功:' + @MemberAccount+','+@MemberPwd+','+@MemberNickname+','+@MemberPhone
+		fetch next from CURSORMember into @MemberAccount,@MemberPwd,@MemberNickname,@MemberPhone
+	end
+close CURSORMember
+```
+
 # 关键字
 
 * **ALTER PROCEDURE**: 修改已存在的存储过程
