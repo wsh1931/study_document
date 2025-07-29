@@ -2120,25 +2120,25 @@ else
 
 **创建索引语法：**
 
-```
+```sql
 CREATE [UNIQUE] [CLUSTERED | NONCLUSTERED]
 INDEX <index name> ON <table or view name>(<column name> [ASC|DESC][,...n])
 ```
 
 **索引基本示例语法：**
 
-```
---exp:创建一个非聚集索引
---create nonclustered index indexAccount on AccountInfo(AccountCode)
---删除一个索引
---drop index indexAccount on AccountInfo
+```sql
+-- exp:创建一个非聚集索引
+-- create nonclustered index indexAccount on AccountInfo(AccountCode)
+-- 删除一个索引
+-- drop index indexAccount on AccountInfo
 ```
 
 备注：索引信息存储在系统视图sys.indexes中。
 
 **按照指定索引进行查询**
 
-```
+```sql
 select * from AccountInfo with(index=indexAccount) where AccountCode='6225125478544587'
 ```
 
@@ -2148,7 +2148,7 @@ select * from AccountInfo with(index=indexAccount) where AccountCode='6225125478
 
 （1）编写视图实现查询出所有银行卡账户信息，显示卡号，身份证，姓名，余额。
 
-```
+```sql
 create view CardAndAccount as
 select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额 from BankCard 
 left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
@@ -2172,7 +2172,7 @@ select * from CardAndAccount
 
 假设有如下表结构和数据：
 
-```
+```sql
 create table Member
 (
 	MemberId int primary key identity(1,1),
@@ -2196,32 +2196,40 @@ values('machao','123456','马超','532523523')
 
 **创建游标：**
 
-```
---1.创建游标(Scroll代表滚动游标，不加Scroll则是只进的，只能支持fetch next)
+```sql
+-- 1.创建游标(Scroll代表滚动游标，不加Scroll则是只进的，只能支持fetch next)
+-- Scroll 关键字表示声明的是 "滚动游标"，这种游标支持多种移动方式（如向前、向后、直接定位到首行 / 末行 / 特定行）
+-- 如果不添加 Scroll 关键字，则默认是 "只进游标"（Forward-Only），这种游标只能支持 FETCH NEXT 操作，即只能从第一行开始依次向后读取数据，不能向前移动或跳跃定位
 declare CURSORMember cursor scroll 
 for select MemberAccount from Member
 ```
 
 **打开游标：**
 
-```
+```sql
 open  CURSORMember
 ```
 
 **提取数据：**
 
-```
-fetch first from CURSORMember --结果集的第一行
-fetch last from CURSORMember  --最后一行
-fetch absolute 1 from CURSORMember --从游标的第一行开始数，第n行。
-fetch relative 3 from CURSORMember --从当前位置数，第n行。
-fetch next from CURSORMember --当前位置的下一行
-fetch prior from CURSORMember --当前位置的上一行
+```sql
+-- 结果集的第一行
+fetch first from CURSORMember
+-- 最后一行
+fetch last from CURSORMember
+-- 从游标的第一行开始数，第n行
+fetch absolute 1 from CURSORMember
+-- 从当前位置数，第n行
+fetch relative 3 from CURSORMember
+-- 当前位置的下一行
+fetch next from CURSORMember
+-- 当前位置的上一行
+fetch prior from CURSORMember
 ```
 
 **提取数据给变量以供它用（取出第3行用户名，查询该用户详细信息）：**
 
-```
+```sql
 declare @MemberAccount varchar(30)
 fetch absolute 3 from CURSORMember into @MemberAccount
 select * from Member where MemberAccount = @MemberAccount
@@ -2229,19 +2237,21 @@ select * from Member where MemberAccount = @MemberAccount
 
 **利用游标提取所有的账户信息：**
 
-```
---方案一：
+```sql
+-- 方案一：
 fetch absolute 1 from CURSORMember
-while @@FETCH_STATUS = 0  --@@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+-- @@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+while @@FETCH_STATUS = 0  
 	begin
 		fetch next from CURSORMember
 	end
 	
---方案二：
+-- 方案二：
 declare @MemberAccount varchar(30)
---fetch next from CURSORMember into @MemberAccount
+-- fetch next from CURSORMember into @MemberAccount
 fetch absolute 1 from CURSORMember into @MemberAccount
-while @@FETCH_STATUS = 0  --@@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+-- @@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+while @@FETCH_STATUS = 0  
 	begin
 		print '提取成功:' + @MemberAccount
 		fetch next from CURSORMember into @MemberAccount
@@ -2250,8 +2260,10 @@ while @@FETCH_STATUS = 0  --@@FETCH_STATUS=0,提取成功，-1提取失败，-2�
 
 **利用游标修改和删除数据：**
 
-```
+```sql
+-- 会将游标 CURSORMember 定位到结果集中的第 3 行
 fetch absolute 3 from CURSORMember
+-- 更新游标当前所指向的那一行数据（也就是刚才定位到的第 3 行）
 update Member set MemberPwd = '1234567' where Current of CURSORMember
 
 fetch absolute 3 from CURSORMember
@@ -2260,20 +2272,21 @@ delete Member where Current of CURSORMember
 
 **关闭游标：**
 
-```
+```sql
 close CURSORMember
 ```
 
 **删除游标：**
 
-```
+```sql
 deallocate CURSORMember
 ```
 
 **创建游标指向某行多列数据,并循环显示数据：**
 
-```
---此处如果指向所有数据，可以将for后面的语句修改成select * from Member
+```sql
+-- 此处如果指向所有数据，可以将for后面的语句修改成select * from Member
+-- INTO 子句的字段映射遵循 “顺序匹配” 原则，即游标查询结果集中的列与 INTO 后变量的对应关系由位置顺序决定，而非字段名或数据类型（但数据类型需兼容）。
 declare CURSORMember cursor scroll
 for select MemberAccount,MemberPwd,MemberNickname,MemberPhone from Member
 
@@ -2284,12 +2297,513 @@ declare	@MemberPwd nvarchar(20)
 declare	@MemberNickname nvarchar(20)
 declare	@MemberPhone nvarchar(20)
 fetch next from CURSORMember into @MemberAccount,@MemberPwd,@MemberNickname,@MemberPhone
-while @@FETCH_STATUS = 0  --@@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+-- @@FETCH_STATUS=0,提取成功，-1提取失败，-2行不存在
+while @@FETCH_STATUS = 0  
 	begin
 		print '提取成功:' + @MemberAccount+','+@MemberPwd+','+@MemberNickname+','+@MemberPhone
 		fetch next from CURSORMember into @MemberAccount,@MemberPwd,@MemberNickname,@MemberPhone
 	end
 close CURSORMember
+```
+
+# 函数-存储过程-触发器
+
+## 一、函数
+
+函数分为（1）系统函数，（2）自定义函数。
+
+其中自定义函数又可以分为（1）标量值函数（返回单个值），（2）表值函数（返回查询结果）
+
+本文主要介绍自定义函数的使用。
+
+（1）编写一个函数求该银行的金额总和
+
+```sql
+create function GetSumCardMoney()
+returns money 
+as
+begin
+	declare @AllMOney money
+	select @AllMOney = (select SUM(CardMoney) from BankCard)
+	return @AllMOney
+end
+```
+
+函数调用
+
+```sql
+select dbo.GetSumCardMoney()
+```
+
+上述函数没有参数，下面介绍有参数的函数的定义及使用
+
+（2）传入账户编号，返回账户真实姓名
+
+```sql
+create function GetNameById(@AccountId int)
+returns  varchar(20)
+as
+begin
+	declare @RealName varchar(20)
+	select @RealName = (select RealName from AccountInfo where AccountId = @AccountId)
+	return @RealName
+end
+```
+
+函数调用
+
+```sql
+print dbo.GetNameById(2)
+```
+
+（3）传递开始时间和结束时间，返回交易记录（存钱取钱），交易记录中包含 真实姓名，卡号，存钱金额，取钱金额，交易时间。
+
+方案一（逻辑复杂，函数内容除了返回结果的sql语句还有其他内容，例如定义变量等）：
+
+```sql
+-- 表值函数的返回逻辑是 “先往定义好的表变量里填数据，最后用 return 告诉系统数据已准备好，可以返回了
+create function GetExchangeByTime(@StartTime varchar(30),@EndTime varchar(30))
+returns @ExchangeTable table
+(
+	RealName varchar(30),  --真实姓名
+	CardNo varchar(30),    --卡号
+	MoneyInBank money,     --存钱金额
+	MoneyOutBank money,    --取钱金额
+	ExchangeTime smalldatetime  --交易时间
+)
+as
+begin
+	insert into @ExchangeTable
+	select AccountInfo.RealName,CardExchange.CardNo,CardExchange.MoneyInBank,
+	CardExchange.MoneyOutBank,CardExchange.ExchangeTime from CardExchange
+	left join BankCard on CardExchange.CardNo = BankCard.CardNo
+	left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+	where CardExchange.ExchangeTime between @StartTime+' 00:00:00' and @EndTime+' 23:59:59'
+	return
+end
+```
+
+函数调用
+
+```sql
+select * from GetExchangeByTime('2018-6-1','2018-7-1')
+```
+
+方案二（逻辑简单，函数内容直接是一条sql查询语句）：
+
+```sql
+create function GetExchangeByTime(@StartTime varchar(30),@EndTime varchar(30))
+returns table
+as
+	return
+	select AccountInfo.RealName,CardExchange.CardNo,CardExchange.MoneyInBank,
+	CardExchange.MoneyOutBank,CardExchange.ExchangeTime from CardExchange
+	left join BankCard on CardExchange.CardNo = BankCard.CardNo
+	left join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+	where CardExchange.ExchangeTime between @StartTime+' 00:00:00' and @EndTime+' 23:59:59'
+go
+```
+
+函数调用：
+
+```SQL
+select * from GetExchangeByTime('2018-6-19','2018-6-19')
+```
+
+（4）查询银行卡信息，将银行卡状态1,2,3,4分别转换为汉字“正常,挂失,冻结,注销”，根据银行卡余额显示银行卡等级 30万以下为“普通用户”,30万及以上为"VIP用户"，分别显示卡号，身份证，姓名，余额，用户等级，银行卡状态。
+
+方案一：直接在sql语句中使用case when
+
+```SQL
+select * from AccountInfo
+select * from BankCard
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额,
+case
+	when CardMoney < 300000 then '普通用户'
+	else 'VIP用户' 
+end 用户等级,
+case
+	when CardState = 1 then '正常'
+	when CardState = 2 then '挂失'
+	when CardState = 3 then '冻结'
+	when CardState = 4 then '注销'
+	else '异常'
+end 卡状态
+from BankCard inner join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+```
+
+方案二：将等级和状态用函数实现
+
+```SQL
+create function GetGradeByMoney(@myMoney int)
+returns varchar(10)
+as
+begin
+	declare @result varchar(10)
+	if @myMoney < 3000 
+		set @result = '普通用户'
+	else
+		set @result = 'VIP用户'
+	return @result
+end
+go
+
+create function GetStatusByNumber(@myNum int)
+returns varchar(10)
+as
+begin
+	declare @result varchar(10)
+	if @myNum = 1
+		set @result = '正常'
+	else if @myNum = 2
+		set @result = '挂失'
+	else if @myNum = 3
+		set @result = '冻结'
+	else if @myNum = 4
+		set @result = '注销'
+	else
+		set @result = '异常'	
+	return @result
+end
+go
+```
+
+函数调用实现查询功能
+
+```SQL
+select CardNo 卡号,AccountCode 身份证,RealName 姓名,CardMoney 余额,
+dbo.GetGradeByMoney(CardMoney) 账户等级,dbo.GetStatusByNumber(CardState) 卡状态
+from BankCard inner join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+```
+
+（5）编写函数，根据出生日期求年龄，年龄求实岁，例如：
+
+​		生日为2000-5-5，当前为2018-5-4，年龄为17岁
+​		生日为2000-5-5，当前为2018-5-6，年龄为18岁
+
+测试数据如下：
+
+```SQL
+create table Emp
+(
+	EmpId int primary key identity(1,2), --自动编号
+	empName varchar(20), --姓名
+	empSex varchar(4),   --性别
+	empBirth smalldatetime --生日
+)
+insert into Emp(empName,empSex,empBirth) values('刘备','男','2008-5-8')
+insert into Emp(empName,empSex,empBirth) values('关羽','男','1998-10-10')
+insert into Emp(empName,empSex,empBirth) values('张飞','男','1999-7-5')
+insert into Emp(empName,empSex,empBirth) values('赵云','男','2003-12-12')
+insert into Emp(empName,empSex,empBirth) values('马超','男','2003-1-5')
+insert into Emp(empName,empSex,empBirth) values('黄忠','男','1988-8-4')
+insert into Emp(empName,empSex,empBirth) values('魏延','男','1998-5-2')
+insert into Emp(empName,empSex,empBirth) values('简雍','男','1992-2-20')
+insert into Emp(empName,empSex,empBirth) values('诸葛亮','男','1993-3-1')
+insert into Emp(empName,empSex,empBirth) values('徐庶','男','1994-8-5')
+```
+
+函数定义：
+
+```sql
+create function GetAgeByBirth(@birth smalldatetime)
+returns int
+as
+begin
+	declare @age int
+	set @age = year(getdate()) - year(@birth)
+	if month(getdate()) < month(@birth)
+		set @age = @age - 1
+	if month(getdate()) = month(@birth) and day(getdate()) < day(@birth)
+		set @age = @age -1
+	return @age
+end
+```
+
+函数调用实现查询
+
+```sql
+select *,dbo.GetAgeByBirth(empBirth) 年龄 from Emp
+```
+
+## 二、触发器
+
+触发器分类：（1） “Instead of”触发器（2）“After”触发器
+“Instead of”触发器：在执行操作之前被执行
+“After”触发器：在执行操作之后被执行
+
+触发器中后面的案例中需要用到的表及测试数据如下：
+
+```sql
+-- 部门
+create table Department
+(
+	DepartmentId varchar(10) primary key , -- 主键，自动增长
+	DepartmentName nvarchar(50), --部门名称
+)
+-- 人员信息
+create table People
+(
+	PeopleId int primary key identity(1,1), -- 主键,自动增长
+	DepartmentId varchar(10), -- 部门编号,外键,与部门表关联
+	PeopleName nvarchar(20), -- 人员姓名
+	PeopleSex nvarchar(2), -- 人员性别
+	PeoplePhone nvarchar(20), -- 电话，联系方式
+)
+insert into Department(DepartmentId,DepartmentName)
+values('001','总经办')
+insert into Department(DepartmentId,DepartmentName)
+values('002','市场部')
+insert into Department(DepartmentId,DepartmentName)
+values('003','人事部')
+insert into Department(DepartmentId,DepartmentName)
+values('004','财务部')
+insert into Department(DepartmentId,DepartmentName)
+values('005','软件部')
+insert into People(DepartmentId,PeopleName,PeopleSex,PeoplePhone)
+values('001','刘备','男','13558785478')
+insert into People(DepartmentId,PeopleName,PeopleSex,PeoplePhone)
+values('001','关羽','男','13558788785')
+insert into People(DepartmentId,PeopleName,PeopleSex,PeoplePhone)
+values('002','张飞','男','13698547125')
+```
+
+（1）假设有部门表和员工表，在添加员工的时候，该员工的部门编号如果在部门表中找不到，则自动添加部门信息，部门名称为"新部门"。
+
+编写触发器：
+
+```sql
+-- inserted 是一个特殊的临时表（也称为 “插入表”），用于存储触发触发器的 INSERT 操作所插入的新数据行。
+create trigger tri_InsertPeople on People
+after insert
+as
+if not exists(select * from Department where DepartmentId = (select DepartmentId from inserted))
+	insert into Department(DepartmentId,DepartmentName)
+	values((select DepartmentId from inserted),'新部门')
+go
+```
+
+测试触发器：
+
+```sql
+insert People(DepartmentId,PeopleName,PeopleSex,PeoplePhone)
+values('009','赵云','男','13854587456')
+```
+
+我们会发现，当插入赵云这个员工的时候会自动向部门表中添加数据。
+
+（2）触发器实现，删除一个部门的时候将部门下所有员工全部删除。
+
+编写触发器：
+
+```sql
+create trigger tri_DeleteDept on Department
+after delete
+as
+delete from People where People.DepartmentId = 
+(select DepartmentId from deleted)
+go
+```
+
+测试触发器：
+
+```sql
+delete Department where DepartmentId = '001'
+```
+
+我们会发现当我们删除此部门的时候，同时会删除该部门下的所有员工
+
+（3）创建一个触发器，删除一个部门的时候判断该部门下是否有员工，有则不删除，没有则删除。
+
+编写触发器：
+
+```sql
+drop trigger tri_DeleteDept	-- 删除掉之前的触发器，因为当前触发器也叫这个名字
+create trigger tri_DeleteDept on Department
+Instead of delete
+as
+  if not exists(select * from People where DepartmentId = (select DepartmentId from deleted))
+  begin
+	delete from Department where DepartmentId = (select DepartmentId from deleted)
+  end
+go
+```
+
+测试触发器：
+
+```sql
+delete Department where DepartmentId = '001'
+delete Department where DepartmentId = '002'
+delete Department where DepartmentId = '003'
+```
+
+我们会发现，当部门下没有员工的部门信息可以成功删除，而部门下有员工的部门并没有被删除。
+
+（4）修改一个部门编号之后，将该部门下所有员工的部门编号同步进行修改
+
+编写触发器：
+
+```sql
+-- 存储更新前的旧数据（被修改前的原始记录）
+-- 存储更新后的新数据（修改后的记录）
+create trigger tri_UpdateDept on Department
+after update
+as
+	update People set DepartmentId = (select DepartmentId from inserted)
+	where DepartmentId = (select DepartmentId from deleted)
+go
+```
+
+测试触发器：
+
+```sql
+update Department set DepartmentId = 'zjb001' where DepartmentId='001'
+```
+
+我们会发现不但部门信息表中的部门编号进行了修改，员工信息表中部门编号为001的信息也被一起修改了。
+
+## 三、存储过程
+
+存储过程（Procedure）是SQL语句和流程控制语句的预编译集合。
+
+（1）没有输入参数，没有输出参数的存储过程。
+
+定义存储过程实现查询出账户余额最低的银行卡账户信息,显示银行卡号，姓名，账户余额
+
+```sql
+-- 方案一
+create proc proc_MinMoneyCard
+as
+    select top 1 CardNo 银行卡号,RealName 姓名,CardMoney 余额
+    from BankCard inner join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+    order by CardMoney asc
+go
+
+-- 方案二：（余额最低，有多个人则显示结果是多个）
+create proc proc_MinMoneyCard
+as
+    select CardNo 银行卡号,RealName 姓名,CardMoney 余额
+    from BankCard inner join AccountInfo on BankCard.AccountId = AccountInfo.AccountId
+    where CardMoney=(select MIN(CardMoney) from BankCard)
+go
+```
+
+执行存储过程：
+
+```sql
+exec proc_MinMoneyCard
+```
+
+（2）有输入参数，没有输出参数的存储过程
+
+模拟银行卡存钱操作，传入银行卡号，存钱金额，实现存钱操作
+
+```sql
+create proc proc_CunQian
+@CardNo varchar(30),
+@MoneyInBank money
+as
+    update BankCard set CardMoney = CardMoney + @MoneyInBank where CardNo = @CardNo
+    insert into CardExchange(CardNo,MoneyInBank,MoneyOutBank,ExchangeTime)
+    values(@CardNo,@MoneyInBank,0,GETDATE())
+go
+```
+
+执行存储过程：
+
+```sql
+exec proc_CunQian '6225125478544587',3000
+```
+
+（3）有输入参数，没有输出参数，但是有返回值的存储过程（返回值必须整数）。
+
+模拟银行卡取钱操作，传入银行卡号，取钱金额，实现取钱操作，取钱成功，返回1，取钱失败返回-1
+
+```sql
+create proc proc_QuQian
+@CardNo varchar(30),
+@MoneyOutBank money
+as
+    update BankCard set CardMoney = CardMoney - @MoneyOutBank where CardNo = @CardNo
+    if @@ERROR <> 0
+        return -1
+    insert into CardExchange(CardNo,MoneyInBank,MoneyOutBank,ExchangeTime)
+    values(@CardNo,0,@MoneyOutBank,GETDATE())
+    return 1
+go
+```
+
+执行存储过程：
+
+```sql
+declare @returnValue int
+exec @returnValue = proc_QuQian '662018092100000002',1000000
+print @returnValue
+```
+
+（4）有输入参数，有输出参数的存储过程
+
+查询出某时间段的银行存取款信息以及存款总金额，取款总金额，传入开始时间，结束时间，显示存取款交易信息的同时，返回存款总金额，取款总金额。
+
+```sql
+create proc proc_SelectExchange
+    @startTime varchar(20),  -- 开始时间
+    @endTime varchar(20),    -- 结束时间
+    @SumIn money output,     -- 存款总金额
+    @SumOut money output    -- 取款总金额
+as
+select @SumIn = (select SUM(MoneyInBank) from CardExchange 
+				where ExchangeTime between @startTime+' 00:00:00' and @endTime+' 23:59:59')
+select @SumOut = (select SUM(MoneyOutBank) from CardExchange 
+				where ExchangeTime between @startTime+' 00:00:00' and @endTime+' 23:59:59')
+select * from CardExchange 
+where ExchangeTime between @startTime+' 00:00:00' and @endTime+' 23:59:59'
+go
+```
+
+执行存储过程：
+
+```sql
+declare @SumIn money     -- 存款总金额
+declare @SumOut money   -- 取款总金额
+exec proc_SelectExchange '2018-1-1','2018-12-31',@SumIn output,@SumOut output
+select @SumIn
+select @SumOut
+```
+
+（5）具有同时输入输出参数的存储过程
+
+密码升级，传入用户名和密码，如果用户名密码正确，并且密码长度<8，自动升级成8位密码
+
+```sql
+-- 有输入输出参数（密码作为输入参数也作为输出参数）
+-- 密码升级，传入用户名和密码，如果用户名密码正确，并且密码长度<8，自动升级成8位密码
+select FLOOR(RAND()*10) --0-9之间随机数
+create proc procPwdUpgrade
+@cardno nvarchar(20),
+@pwd nvarchar(20) output
+as
+	if not exists(select * from BankCard where CardNo=@cardno and CardPwd=@pwd)
+		set @pwd = ''
+	else
+	begin
+		if len(@pwd) < 8
+		begin
+			declare @len int = 8- len(@pwd)
+			declare @i int = 1
+			while @i <= @len
+			begin
+				
+				set @pwd = @pwd + cast(FLOOR(RAND()*10) as varchar(1))
+				set @i = @i+1
+			end
+			update BankCard set CardPwd = @pwd where CardNo=@cardno
+		end
+	end
+go
+declare @pwd nvarchar(20) = '123456'
+exec procPwdUpgrade '6225547854125656',@pwd output
+select @pwd
 ```
 
 # 关键字
