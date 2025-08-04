@@ -1089,6 +1089,16 @@ Function<String, String> function = a -> a + " Jack!";
 System.out.println(function.apply("Hello")); // Hello Jack!
 ```
 
+```java
+ Map<String, Function<MedicalQualityVo, String>> fieldGetters = new LinkedHashMap<>();
+        fieldGetters.put("zfy", MedicalQualityVo::getZfy);
+
+fieldGetters.forEach((field, getter) -> {
+    // 相当于 medicalQualityVo.getField()。如：medicalQualityVo.getZfy();
+    String value = getter.apply(vo);
+});
+```
+
 **andThen(Function<? super R,? extends V> after)**
 
 ```java
