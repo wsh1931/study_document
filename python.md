@@ -744,3 +744,825 @@ if x:
 ```
 
 只要`x`是非零数值、非空字符串、非空list等，就判断为`True`，否则为`False`。
+
+**input输入问题**
+
+```py
+birth = input('birth: ')
+if birth < 2000:
+    print('00前')
+else:
+    print('00后')
+```
+
+输入`1982`，结果报错：
+
+```py
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: unorderable types: str() > int()
+```
+
+这是因为`input()`返回的数据类型是`str`，`str`不能直接和整数比较，必须先把`str`转换成整数。Python提供了`int()`函数来完成这件事情：
+
+```py
+s = input('birth: ')
+birth = int(s)
+if birth < 2000:
+    print('00前')
+else:
+    print('00后')
+```
+
+## 模式匹配
+
+如果要针对某个变量匹配若干种情况，可以使用`match`语句。
+
+例如，某个学生的成绩只能是`A`、`B`、`C`，用`if`语句编写如下：
+
+```py
+score = 'B'
+if score == 'A':
+    print('score is A.')
+elif score == 'B':
+    print('score is B.')
+elif score == 'C':
+    print('score is C.')
+else:
+    print('invalid score.')
+```
+
+如果用`match`语句改写，则改写如下：
+
+```py
+score = 'B'
+match score:
+    case 'A':
+        print('score is A.')
+    case 'B':
+        print('score is B.')
+    case 'C':
+        print('score is C.')
+    case _: # _表示匹配到其他任何情况
+        print('score is ???.')
+```
+
+### 复杂匹配
+
+`match`语句除了可以匹配简单的单个值外，还可以匹配多个值、匹配一定范围，并且把匹配后的值绑定到变量：
+
+```py
+age = 15
+match age:
+    case x if x < 10:
+        print(f'< 10 years old: {x}')
+    case 10:
+        print('10 years old.')
+    case 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18:
+        print('11~18 years old.')
+    case 19:
+        print('19 years old.')
+    case _:
+        print('not sure.')
+```
+
+在上面这个示例中，第一个`case x if x < 10`表示当`age < 10`成立时匹配，且赋值给变量`x`，第二个`case 10`仅匹配单个值，第三个`case 11|12|...|18`能匹配多个值，用`|`分隔。
+
+### 匹配列表
+
+输入了一个命令，用`args = ['gcc', 'hello.c']`存储，下面的代码演示了如何用`match`匹配来解析这个列表：
+
+```py
+args = ['gcc', 'hello.c', 'world.c']
+# args = ['clean']
+# args = ['gcc']
+match args:
+    # 如果仅出现gcc，报错:
+    case ['gcc']:
+        print('gcc: missing source file(s).')
+    # 出现gcc，且至少指定了一个文件:
+    case ['gcc', file1, *files]:
+        print('gcc compile: ' + file1 + ', ' + ', '.join(files))
+    # 仅出现clean:
+    case ['clean']:
+        print('clean')
+    case _:
+        print('invalid command.')
+```
+
+第一个`case ['gcc']`表示列表仅有`'gcc'`一个字符串，没有指定文件名，报错；
+
+第二个`case ['gcc', file1, *files]`表示列表第一个字符串是`'gcc'`，第二个字符串绑定到变量`file1`，后面的任意个字符串绑定到`*files`它实际上表示至少指定一个文件；
+
+第三个`case ['clean']`表示列表仅有`'clean'`一个字符串；
+
+最后一个`case _`表示其他所有情况。
+
+## 循环
+
+Python的循环有两种，一种是for...in循环，依次把list或tuple中的每个元素迭代出来
+
+```py
+names = ['Michael', 'Bob', 'Tracy']
+for name in names:
+    print(name)
+Michael
+Bob
+Tracy
+```
+
+如果要计算1-100的整数之和，从1写到100有点困难，幸好Python提供一个`range()`函数，可以生成一个整数序列，再通过`list()`函数可以转换为list。比如`range(5)`生成的序列是从0开始小于5的整数：
+
+```py
+>>> list(range(5))
+[0, 1, 2, 3, 4]
+```
+
+`range(101)`就可以生成0-100的整数序列，计算如下：
+
+```py
+sum = 0
+for x in range(101):
+    sum = sum + x
+print(sum)
+```
+
+第二种循环是while循环，只要条件满足，就不断循环，条件不满足时退出循环。比如我们要计算100以内所有奇数之和，可以用while循环实现：
+
+```py
+sum = 0
+n = 99
+while n > 0:
+    sum = sum + n
+    n = n - 2
+print(sum)
+```
+
+## dict
+
+Python内置了字典：dict的支持，dict全称dictionary，在其他语言中也称为map，使用键-值（key-value）存储，具有极快的查找速度。
+
+用Python写一个dict如下：
+
+```py
+>>> d = {'Michael': 95, 'Bob': 75, 'Tracy': 85}
+>>> d['Michael']
+95
+```
+
+把数据放入dict的方法，除了初始化时指定外，还可以通过key放入：
+
+```py
+>>> d['Adam'] = 67
+>>> d['Adam']
+67
+```
+
+由于一个key只能对应一个value，所以，多次对一个key放入value，后面的值会把前面的值冲掉：
+
+```py
+>>> d['Jack'] = 90
+>>> d['Jack']
+90
+>>> d['Jack'] = 88
+>>> d['Jack']
+88
+```
+
+如果key不存在，dict就会报错：
+
+```py
+>>> d['Thomas']
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+KeyError: 'Thomas'
+```
+
+要避免key不存在的错误，有两种办法，一是通过`in`判断key是否存在：
+
+```py
+>>> 'Thomas' in d
+False
+```
+
+二是通过dict提供的`get()`方法，如果key不存在，可以返回`None`，或者自己指定的value：
+
+```py
+>>> d.get('Thomas')
+>>> d.get('Thomas', -1)
+-1
+```
+
+注意：返回`None`的时候Python的交互环境不显示结果。
+
+要删除一个key，用`pop(key)`方法，对应的value也会从dict中删除：
+
+```py
+>>> d.pop('Bob')
+75
+>>> d
+{'Michael': 95, 'Tracy': 85}
+```
+
+dict内部存放的顺序和key放入的顺序是没有关系的。
+
+和list比较，dict有以下几个特点：
+
+1. 查找和插入的速度极快，不会随着key的增加而变慢；
+2. 需要占用大量的内存，内存浪费多。
+
+而list相反：
+
+1. 查找和插入的时间随着元素的增加而增加；
+2. 占用空间小，浪费内存很少。
+
+所以，dict是用空间来换取时间的一种方法。
+
+要保证hash的正确性，作为key的对象就不能变。在Python中，字符串、整数等都是不可变的，因此，可以放心地作为key。而list是可变的，就不能作为key：
+
+```py
+>>> key = [1, 2, 3]
+>>> d[key] = 'a list'
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: unhashable type: 'list'
+```
+
+## set
+
+set和dict类似，也是一组key的集合，但不存储value。由于key不能重复，所以，在set中，没有重复的key。
+
+要创建一个set，用`{x,y,z,...}`列出每个元素：
+
+```py
+>>> s = {1, 2, 3}
+>>> s
+{1, 2, 3}
+```
+
+或者提供一个list作为输入集合：
+
+```py
+>>> s = set([1, 2, 3])
+>>> s
+{1, 2, 3}
+```
+
+注意，传入的参数`[1, 2, 3]`是一个list，而显示的`{1, 2, 3}`只是告诉你这个set内部有1，2，3这3个元素，显示的顺序也不表示set是有序的。。
+
+重复元素在set中自动被过滤：
+
+```py
+>>> s = {1, 1, 2, 2, 3, 3}
+>>> s
+{1, 2, 3}
+```
+
+通过`add(key)`方法可以添加元素到set中，可以重复添加，但不会有效果：
+
+```py
+>>> s.add(4)
+>>> s
+{1, 2, 3, 4}
+>>> s.add(4)
+>>> s
+{1, 2, 3, 4}
+```
+
+通过`remove(key)`方法可以删除元素：
+
+```py
+>>> s.remove(4)
+>>> s
+{1, 2, 3}
+```
+
+set可以看成数学意义上的无序和无重复元素的集合，因此，两个set可以做数学意义上的交集、并集等操作：
+
+```py
+>>> s1 = {1, 2, 3}
+>>> s2 = {2, 3, 4}
+>>> s1 & s2
+{2, 3}
+>>> s1 | s2
+{1, 2, 3, 4}
+```
+
+### 再议不可变对象
+
+str是不变对象，而list是可变对象。
+
+对于可变对象，比如list，对list进行操作，list内部的内容是会变化的，比如：
+
+```py
+>>> a = ['c', 'b', 'a']
+>>> a.sort()
+>>> a
+['a', 'b', 'c']
+```
+
+而对于不可变对象，比如str，对str进行操作呢：
+
+```py
+>>> a = 'abc'
+>>> a.replace('a', 'A')
+'Abc'
+>>> a
+'abc'
+```
+
+虽然字符串有个`replace()`方法，也确实变出了`'Abc'`，但变量`a`最后仍是`'abc'`，应该怎么理解呢？
+
+我们先把代码改成下面这样：
+
+```py
+>>> a = 'abc'
+>>> b = a.replace('a', 'A')
+>>> b
+'Abc'
+>>> a
+'abc'
+```
+
+​	要始终牢记的是，`a`是变量，而`'abc'`才是字符串对象！有些时候，我们经常说，对象`a`的内容是`'abc'`，但其实是指，`a`本身是一个变量，它指向的对象的内容才是`'abc'`：
+
+​	当我们调用`a.replace('a', 'A')`时，实际上调用方法`replace`是作用在字符串对象`'abc'`上的，而这个方法虽然名字叫`replace`，但却没有改变字符串`'abc'`的内容。相反，`replace`方法创建了一个新字符串`'Abc'`并返回，如果我们用变量`b`指向该新字符串，就容易理解了，变量`a`仍指向原有的字符串`'abc'`，但变量`b`却指向新字符串`'Abc'`了：
+
+​	所以，对于不变对象来说，调用对象自身的任意方法，也不会改变该对象自身的内容。相反，这些方法会创建新的对象并返回，这样，就保证了不可变对象本身永远是不可变的。
+
+## 函数
+
+### 内置函数
+
+`abs`：
+
+```py
+>>> abs(100)
+100
+>>> abs(-20)
+20
+>>> abs(12.34)
+12.34
+```
+
+调用函数的时候，如果传入的参数数量不对，会报`TypeError`的错误，并且Python会明确地告诉你：`abs()`有且仅有1个参数，但给出了两个：
+
+```py
+>>> abs(1, 2)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: abs() takes exactly one argument (2 given)
+```
+
+如果传入的参数数量是对的，但参数类型不能被函数所接受，也会报`TypeError`的错误，并且给出错误信息：`str`是错误的参数类型：
+
+```py
+>>> abs('a')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: bad operand type for abs(): 'str'
+```
+
+`max`
+
+```py
+>>> max(1, 2)
+2
+>>> max(2, 3, 1, -5)
+3
+```
+
+数据类型转换
+
+```py
+>>> int('123')
+123
+>>> int(12.34)
+12
+>>> float('12.34')
+12.34
+>>> str(1.23)
+'1.23'
+>>> str(100)
+'100'
+>>> bool(1)
+True
+>>> bool('')
+False
+```
+
+函数名其实就是指向一个函数对象的引用，完全可以把函数名赋给一个变量，相当于给这个函数起了一个“别名”：
+
+```py
+>>> a = abs # 变量a指向abs函数
+>>> a(-1) # 所以也可以通过a调用abs函数
+1
+```
+
+### 定义函数
+
+​	在Python中，定义一个函数要使用`def`语句，依次写出函数名、括号、括号中的参数和冒号`:`，然后，在缩进块中编写函数体，函数的返回值用`return`语句返回。
+
+我们以自定义一个求绝对值的`my_abs`函数为例：
+
+```py
+def my_abs(x):
+    if x >= 0:
+        return x
+    else:
+        return -x
+
+print(my_abs(-99))
+```
+
+如果没有`return`语句，函数执行完毕后也会返回结果，只是结果为`None`。`return None`可以简写为`return`。
+
+​	已经把`my_abs()`的函数定义保存为`abstest.py`文件了，那么，可以在该文件的当前目录下启动Python解释器，用`from abstest import my_abs`来导入`my_abs()`函数，注意`abstest`是文件名（不含`.py`扩展名）：
+
+**空函数**
+
+如果想定义一个什么事也不做的空函数，可以用`pass`语句：
+
+```python
+def nop():
+    pass
+```
+
+​	`pass`语句什么都不做，那有什么用？实际上`pass`可以用来作为占位符，比如现在还没想好怎么写函数的代码，就可以先放一个`pass`，让代码能运行起来。
+
+`pass`还可以用在其他语句里，比如：
+
+```python
+if age >= 18:
+    pass
+```
+
+**参数检查**
+
+修改一下`my_abs`的定义，对参数类型做检查，只允许整数和浮点数类型的参数。数据类型检查可以用内置函数`isinstance()`实现：
+
+```py
+def my_abs(x):
+    if not isinstance(x, (int, float)):
+        raise TypeError('bad operand type')
+    if x >= 0:
+        return x
+    else:
+        return -x
+```
+
+**返回多个值**
+
+比如在游戏中经常需要从一个点移动到另一个点，给出坐标、位移和角度，就可以计算出新的坐标：
+
+```python
+import math
+
+def move(x, y, step, angle=0):
+    nx = x + step * math.cos(angle)
+    ny = y - step * math.sin(angle)
+    return nx, ny
+```
+
+然后，我们就可以同时获得返回值：
+
+```py
+>>> x, y = move(100, 100, 60, math.pi / 6)
+>>> print(x, y)
+151.96152422706632 70.0
+```
+
+但其实这只是一种假象，Python函数返回的仍然是单一值：
+
+```py
+>>> r = move(100, 100, 60, math.pi / 6)
+>>> print(r)
+(151.96152422706632, 70.0)
+```
+
+​	原来返回值是一个tuple！但是，在语法上，返回一个tuple可以省略括号，而多个变量可以同时接收一个tuple，按位置赋给对应的值，所以，Python的函数返回多值其实就是返回一个tuple，但写起来更方便。
+
+## 函数的参数
+
+### 默认参数
+
+```py
+def power(x, n=2):
+    s = 1
+    while n > 0:
+        n = n - 1
+        s = s * x
+    return s
+>>> power(5)
+25
+>>> power(5, 2)
+25
+```
+
+这样，当我们调用`power(5)`时，相当于调用`power(5, 2)`：
+
+必选参数在前，默认参数在后，否则Python的解释器会报错.
+
+​	有多个默认参数时，调用的时候，既可以按顺序提供默认参数，比如调用`enroll('Bob', 'M', 7)`，意思是，除了`name`，`gender`这两个参数外，最后1个参数应用在参数`age`上，`city`参数由于没有提供，仍然使用默认值。
+
+​	也可以不按顺序提供部分默认参数。当不按顺序提供部分默认参数时，需要把参数名写上。比如调用`enroll('Adam', 'M', city='Tianjin')`，意思是，`city`参数用传进去的值，其他默认参数继续使用默认值。
+
+默认参数很有用，但使用不当，也会掉坑里。默认参数有个最大的坑，演示如下：
+
+先定义一个函数，传入一个list，添加一个`END`再返回：
+
+```py
+def add_end(L=[]):
+    L.append('END')
+    return L
+```
+
+当你正常调用时，结果似乎不错：
+
+```py
+>>> add_end([1, 2, 3])
+[1, 2, 3, 'END']
+>>> add_end(['x', 'y', 'z'])
+['x', 'y', 'z', 'END']
+```
+
+当你使用默认参数调用时，一开始结果也是对的：
+
+```py
+>>> add_end()
+['END']
+```
+
+但是，再次调用`add_end()`时，结果就不对了：
+
+```py
+>>> add_end()
+['END', 'END']
+>>> add_end()
+['END', 'END', 'END']
+```
+
+​	Python函数在定义的时候，默认参数`L`的值就被计算出来了，即`[]`，因为默认参数`L`也是一个变量，它指向对象`[]`，每次调用该函数，如果改变了`L`的内容，则下次调用时，默认参数的内容就变了，不再是函数定义时的`[]`了。
+
+定义默认参数要牢记一点：默认参数必须指向不变对象！
+
+```py
+def add_end(L=None):
+    if L is None:
+        L = []
+    L.append('END')
+    return L
+```
+
+现在，无论调用多少次，都不会有问题：
+
+```py
+>>> add_end()
+['END']
+>>> add_end()
+['END']
+```
+
+​	为什么要设计`str`、`None`这样的不变对象呢？因为不变对象一旦创建，对象内部的数据就不能修改，这样就减少了由于修改数据导致的错误。此外，由于对象不变，多任务环境下同时读取对象不需要加锁，同时读一点问题都没有。我们在编写程序时，如果可以设计一个不变对象，那就尽量设计成不变对象。
+
+### 可变参数
+
+​	在Python函数中，还可以定义可变参数。顾名思义，可变参数就是传入的参数个数是可变的，可以是1个、2个到任意个，还可以是0个。
+
+我们以数学题为例子，给定一组数字a，b，c……，请计算a2 + b2 + c2 + ……。
+
+​	要定义出这个函数，我们必须确定输入的参数。由于参数个数不确定，我们首先想到可以把a，b，c……作为一个list或tuple传进来，这样，函数可以定义如下：
+
+```python
+def calc(numbers):
+    sum = 0
+    for n in numbers:
+        sum = sum + n * n
+    return sum
+```
+
+但是调用的时候，需要先组装出一个list或tuple：
+
+```py
+>>> calc([1, 2, 3])
+14
+>>> calc((1, 3, 5, 7))
+84
+```
+
+
+
+如果利用可变参数，调用函数的方式可以简化成这样：
+
+```py
+>>> calc(1, 2, 3)
+14
+>>> calc(1, 3, 5, 7)
+84
+```
+
+
+
+所以，我们把函数的参数改为可变参数：
+
+```py
+def calc(*numbers):
+    sum = 0
+    for n in numbers:
+        sum = sum + n * n
+    return sum
+```
+
+定义可变参数和定义一个list或tuple参数相比，仅仅在参数前面加了一个`*`号。在函数内部，参数`numbers`接收到的是一个tuple，因此，函数代码完全不变。但是，调用该函数时，可以传入任意个参数，包括0个参数：
+
+```py
+>>> calc(1, 2)
+5
+>>> calc()
+0
+```
+
+如果已经有一个list或者tuple，要调用一个可变参数怎么办？可以这样做：
+
+```py
+>>> nums = [1, 2, 3]
+>>> calc(nums[0], nums[1], nums[2])
+14
+```
+
+这种写法当然是可行的，问题是太繁琐，所以Python允许你在list或tuple前面加一个`*`号，把list或tuple的元素变成可变参数传进去：
+
+```py
+>>> nums = [1, 2, 3]
+>>> calc(*nums)
+14
+```
+
+`*nums`表示把`nums`这个list的所有元素作为可变参数传进去。这种写法相当有用，而且很常见。
+
+### 关键字参数
+
+​	可变参数允许你传入0个或任意个参数，这些可变参数在函数调用时自动组装为一个tuple。而关键字参数允许你传入0个或任意个含参数名的参数，这些关键字参数在函数内部自动组装为一个dict。请看示例：
+
+```python
+def person(name, age, **kw):
+    print('name:', name, 'age:', age, 'other:', kw)
+```
+
+函数`person`除了必选参数`name`和`age`外，还接受关键字参数`kw`。在调用该函数时，可以只传入必选参数：
+
+```py
+>>> person('Michael', 30)
+name: Michael age: 30 other: {}
+```
+
+也可以传入任意个数的关键字参数：
+
+```py
+>>> person('Bob', 35, city='Beijing')
+name: Bob age: 35 other: {'city': 'Beijing'}
+>>> person('Adam', 45, gender='M', job='Engineer')
+name: Adam age: 45 other: {'gender': 'M', 'job': 'Engineer'}
+```
+
+​	关键字参数有什么用？它可以扩展函数的功能。比如，在`person`函数里，我们保证能接收到`name`和`age`这两个参数，但是，如果调用者愿意提供更多的参数，我们也能收到。试想你正在做一个用户注册的功能，除了用户名和年龄是必填项外，其他都是可选项，利用关键字参数来定义这个函数就能满足注册的需求。
+
+和可变参数类似，也可以先组装出一个dict，然后，把该dict转换为关键字参数传进去：
+
+```py
+>>> extra = {'city': 'Beijing', 'job': 'Engineer'}
+>>> person('Jack', 24, city=extra['city'], job=extra['job'])
+name: Jack age: 24 other: {'city': 'Beijing', 'job': 'Engineer'}
+```
+
+当然，上面复杂的调用可以用简化的写法：
+
+```py
+>>> extra = {'city': 'Beijing', 'job': 'Engineer'}
+>>> person('Jack', 24, **extra)
+name: Jack age: 24 other: {'city': 'Beijing', 'job': 'Engineer'}
+```
+
+`**extra`表示把`extra`这个dict的所有key-value用关键字参数传入到函数的`**kw`参数，`kw`将获得一个dict，注意`kw`获得的dict是`extra`的一份拷贝，对`kw`的改动不会影响到函数外的`extra`。
+
+### 命名关键字参数
+
+对于关键字参数，函数的调用者可以传入任意不受限制的关键字参数。至于到底传入了哪些，就需要在函数内部通过`kw`检查。
+
+仍以`person()`函数为例，我们希望检查是否有`city`和`job`参数：
+
+```python
+def person(name, age, **kw):
+    if 'city' in kw:
+        # 有city参数
+        pass
+    if 'job' in kw:
+        # 有job参数
+        pass
+    print('name:', name, 'age:', age, 'other:', kw)
+```
+
+但是调用者仍可以传入不受限制的关键字参数：
+
+```py
+>>> person('Jack', 24, city='Beijing', addr='Chaoyang', zipcode=123456)
+```
+
+如果要限制关键字参数的名字，就可以用命名关键字参数，例如，只接收`city`和`job`作为关键字参数。这种方式定义的函数如下：
+
+```python
+def person(name, age, *, city, job):
+    print(name, age, city, job)
+```
+
+和关键字参数`**kw`不同，命名关键字参数需要一个特殊分隔符`*`，`*`后面的参数被视为命名关键字参数。
+
+调用方式如下：
+
+```py
+>>> person('Jack', 24, city='Beijing', job='Engineer')
+Jack 24 Beijing Engineer
+```
+
+如果函数定义中已经有了一个可变参数，后面跟着的命名关键字参数就不再需要一个特殊分隔符`*`了：
+
+```python
+def person(name, age, *args, city, job):
+    print(name, age, args, city, job)
+```
+
+命名关键字参数必须传入参数名，这和位置参数不同。如果没有传入参数名，调用将报错：
+
+```py
+>>> person('Jack', 24, 'Beijing', 'Engineer')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: person() missing 2 required keyword-only arguments: 'city' and 'job'
+```
+
+​	由于调用时缺少参数名`city`和`job`，Python解释器把前两个参数视为位置参数，后两个参数传给`*args`，但缺少命名关键字参数导致报错。
+
+命名关键字参数可以有缺省值，从而简化调用：
+
+```python
+def person(name, age, *, city='Beijing', job):
+    print(name, age, city, job)
+```
+
+由于命名关键字参数`city`具有默认值，调用时，可不传入`city`参数：
+
+```py
+>>> person('Jack', 24, job='Engineer')
+Jack 24 Beijing Engineer
+```
+
+​	使用命名关键字参数时，要特别注意，如果没有可变参数，就必须加一个`*`作为特殊分隔符。如果缺少`*`，Python解释器将无法识别位置参数和命名关键字参数：
+
+```python
+def person(name, age, city, job):
+    # 缺少 *，city和job被视为位置参数
+    pass
+```
+
+### 参数组合
+
+在Python中定义函数，可以用必选参数、默认参数、可变参数、关键字参数和命名关键字参数，这5种参数都可以组合使用。但是请注意，参数定义的顺序必须是：必选参数、默认参数、可变参数、命名关键字参数和关键字参数。
+
+比如定义一个函数，包含上述若干种参数：
+
+```py
+def f1(a, b, c=0, *args, **kw):
+    print('a =', a, 'b =', b, 'c =', c, 'args =', args, 'kw =', kw)
+
+def f2(a, b, c=0, *, d, **kw):
+    print('a =', a, 'b =', b, 'c =', c, 'd =', d, 'kw =', kw)
+```
+
+在函数调用的时候，Python解释器自动按照参数位置和参数名把对应的参数传进去。
+
+```py
+>>> f1(1, 2)
+a = 1 b = 2 c = 0 args = () kw = {}
+>>> f1(1, 2, c=3)
+a = 1 b = 2 c = 3 args = () kw = {}
+>>> f1(1, 2, 3, 'a', 'b')
+a = 1 b = 2 c = 3 args = ('a', 'b') kw = {}
+>>> f1(1, 2, 3, 'a', 'b', x=99)
+a = 1 b = 2 c = 3 args = ('a', 'b') kw = {'x': 99}
+>>> f2(1, 2, d=99, ext=None)
+a = 1 b = 2 c = 0 d = 99 kw = {'ext': None}
+```
+
+```py
+>>> args = (1, 2, 3, 4)
+>>> kw = {'d': 99, 'x': '#'}
+>>> f1(*args, **kw)
+a = 1 b = 2 c = 3 args = (4,) kw = {'d': 99, 'x': '#'}
+>>> args = (1, 2, 3)
+>>> kw = {'d': 88, 'x': '#'}
+>>> f2(*args, **kw)
+a = 1 b = 2 c = 3 d = 88 kw = {'x': '#'}
+
+```
+
+所以，对于任意函数，都可以通过类似`func(*args, **kw)`的形式调用它，无论它的参数是如何定义的。
