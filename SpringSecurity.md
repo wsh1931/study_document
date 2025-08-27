@@ -779,7 +779,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 RBAC权限模型（Role-Based Access Control）即：基于角色的权限控制。这是目前最常被开发者使用也是相对易用、通用权限模型。
 
-[![img](./images/68747470733a2f2f696d67323032322e636e626c6f67732e636f6d2f626c6f672f323930393831342f3230323230382f323930393831342d32303232303831353137313531333538302d39393638323932342e706e67.png)](https://camo.githubusercontent.com/1957f20a6bd79f4d6700e5a332e0118fa59052a7c09427ab91cc63c88c533e6e/68747470733a2f2f696d67323032322e636e626c6f67732e636f6d2f626c6f672f323930393831342f3230323230382f323930393831342d32303232303831353137313531333538302d39393638323932342e706e67)
+[![img](images/SpringSecurity/68747470733a2f2f696d67323032322e636e626c6f67732e636f6d2f626c6f672f323930393831342f3230323230382f323930393831342d32303232303831353137313531333538302d39393638323932342e706e67.png)](https://camo.githubusercontent.com/1957f20a6bd79f4d6700e5a332e0118fa59052a7c09427ab91cc63c88c533e6e/68747470733a2f2f696d67323032322e636e626c6f67732e636f6d2f626c6f672f323930393831342f3230323230382f323930393831342d32303232303831353137313531333538302d39393638323932342e706e67)
 
 ##### 准备工作
 
@@ -1514,7 +1514,7 @@ OAuth 2协议包含以下角色：
 3. 资源服务器（Resource Server）：存储受保护资源的服务器或定义了可以访问到资源的API，接收并验证客户端的访问令牌，以决定是否授权访问资源。
 4. 授权服务器（Authorization Server）：负责验证资源所有者的身份并向客户端颁发访问令牌。
 
-[![image-20231222124053994](./images/image-20231222124053994-1742615211625-1.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222124053994.png)
+[![image-20231222124053994](images/SpringSecurity/image-20231222124053994-1742615211625-1.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222124053994.png)
 
 ### OAuth2的使用场景
 
@@ -1524,13 +1524,13 @@ OAuth 2协议包含以下角色：
 
 在传统的身份验证中，用户需要提供用户名和密码，还有很多网站登录时，允许使用第三方网站的身份，这称为"第三方登录"。所谓第三方登录，实质就是 OAuth 授权。用户想要登录 A 网站，A 网站让用户提供第三方网站的数据，证明自己的身份。获取第三方网站的身份数据，就需要 OAuth 授权。
 
-[![image-20231222131233025](./images/image-20231222131233025-1742615211630-2.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222131233025.png)
+[![image-20231222131233025](images/SpringSecurity/image-20231222131233025-1742615211630-2.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222131233025.png)
 
 ##### 开放API
 
 例如云冲印服务的实现
 
-[![image-20231222131118611](./images/image-20231222131118611-1742615211630-3.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222131118611.png)
+[![image-20231222131118611](images/SpringSecurity/image-20231222131118611-1742615211630-3.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222131118611.png)
 
 #### 现代微服务安全
 
@@ -1538,13 +1538,13 @@ OAuth 2协议包含以下角色：
 
 
 
-[![image-20231222152734546](./images/image-20231222152734546-1742615211631-4.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222152734546.png)
+[![image-20231222152734546](images/SpringSecurity/image-20231222152734546-1742615211631-4.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222152734546.png)
 
 ##### 微服务安全
 
 
 
-[![image-20231222152557861](./images/image-20231222152557861-1742615211631-5.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222152557861.png)
+[![image-20231222152557861](images/SpringSecurity/image-20231222152557861-1742615211631-5.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222152557861.png)
 
 #### 企业内部应用认证授权
 
@@ -1574,11 +1574,11 @@ RFC6749：
 
 这种方式是最常用，最复杂，也是最安全的，它适用于那些有后端的 Web 应用。授权码通过前端传送，令牌则是储存在后端，而且所有与资源服务器的通信都在后端完成。这样的前后端分离，可以避免令牌泄漏。
 
-[![image-20231220180422742](./images/image-20231220180422742-1742615211631-6.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231220180422742.png)
+[![image-20231220180422742](images/SpringSecurity/image-20231220180422742-1742615211631-6.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231220180422742.png)
 
 - 注册客户应用：客户应用如果想要访问资源服务器需要有凭证，需要在授权服务器上注册客户应用。注册后会**获取到一个ClientID和ClientSecrets**
 
-[![image-20231222203153125](./images/image-20231222203153125-1742615211631-7.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222203153125.png)
+[![image-20231222203153125](images/SpringSecurity/image-20231222203153125-1742615211631-7.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222203153125.png)
 
 #### 第二种方式：隐藏式
 
@@ -1586,9 +1586,9 @@ RFC6749：
 
 RFC 6749 规定了这种方式，允许直接向前端颁发令牌。这种方式没有授权码这个中间步骤，所以称为隐藏式。这种方式把令牌直接传给前端，是很不安全的。因此，只能用于一些安全要求不高的场景，并且令牌的有效期必须非常短，通常就是会话期间（session）有效，浏览器关掉，令牌就失效了。
 
- [![image-20231220185958063](./images/image-20231220185958063-1742615211631-8.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231220185958063.png)
+ [![image-20231220185958063](images/SpringSecurity/image-20231220185958063-1742615211631-8.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231220185958063.png)
 
-[![image-20231222203218334](./images/image-20231222203218334-1742615211631-9.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222203218334.png)
+[![image-20231222203218334](images/SpringSecurity/image-20231222203218334-1742615211631-9.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222203218334.png)
 
 ```
 https://a.com/callback#token=ACCESS_TOKEN
@@ -1601,9 +1601,9 @@ https://a.com/callback#token=ACCESS_TOKEN
 
 这种方式需要用户给出自己的用户名/密码，显然风险很大，因此只适用于其他授权方式都无法采用的情况，而且必须是用户高度信任的应用。
 
-[![image-20231220190152888](./images/image-20231220190152888-1742615211631-10.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231220190152888.png)
+[![image-20231220190152888](images/SpringSecurity/image-20231220190152888-1742615211631-10.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231220190152888.png)
 
-[![image-20231222203240921](./images/image-20231222203240921-1742615211632-11.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222203240921.png)
+[![image-20231222203240921](images/SpringSecurity/image-20231222203240921-1742615211632-11.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222203240921.png)
 
 #### 第四种方式：凭证式
 
@@ -1611,15 +1611,15 @@ https://a.com/callback#token=ACCESS_TOKEN
 
 这种方式给出的令牌，是针对第三方应用的，而不是针对用户的，即有可能多个用户共享同一个令牌。
 
-[![image-20231220185958063](./images/image-20231220185958063-1742615211631-8.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231220185958063.png)
+[![image-20231220185958063](images/SpringSecurity/image-20231220185958063-1742615211631-8.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231220185958063.png)
 
-[![image-20231222203259785](./images/image-20231222203259785-1742615211632-12.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222203259785.png)
+[![image-20231222203259785](images/SpringSecurity/image-20231222203259785-1742615211632-12.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231222203259785.png)
 
 ### 1.5、授权类型的选择
 
 
 
-[![image-20231223020052999](./images/image-20231223020052999-1742615211632-13.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231223020052999.png)
+[![image-20231223020052999](images/SpringSecurity/image-20231223020052999-1742615211632-13.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231223020052999.png)
 
 ## Spring中的OAuth2
 
@@ -1671,7 +1671,7 @@ https://a.com/callback#token=ACCESS_TOKEN
 
 使用OAuth2 Login
 
-[![image-20231223164128030](./images/image-20231223164128030-1742615211632-14.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231223164128030.png)
+[![image-20231223164128030](images/SpringSecurity/image-20231223164128030-1742615211632-14.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231223164128030.png)
 
 ## GiuHub社交登录案例
 
@@ -1681,21 +1681,21 @@ https://a.com/callback#token=ACCESS_TOKEN
 
 登录GitHub，在开发者设置中找到OAuth Apps，创建一个application，为客户应用创建访问GitHub的凭据：
 
-[![image-20230510154255157](./images/image-20230510154255157-1742615211632-15.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20230510154255157.png)
+[![image-20230510154255157](images/SpringSecurity/image-20230510154255157-1742615211632-15.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20230510154255157.png)
 
 填写应用信息：`默认的重定向URI模板为{baseUrl}/login/oauth2/code/{registrationId}`。registrationId是ClientRegistration的唯一标识符。
 
-[![image-20231221000906168](./images/image-20231221000906168-1742615211632-16.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231221000906168.png)
+[![image-20231221000906168](images/SpringSecurity/image-20231221000906168-1742615211632-16.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231221000906168.png)
 
 获取应用程序id，生成应用程序密钥：
 
-[![image-20230510163101376](./images/image-20230510163101376-1742615211632-17.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20230510163101376.png)
+[![image-20230510163101376](images/SpringSecurity/image-20230510163101376-1742615211632-17.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20230510163101376.png)
 
 ### 创建测试项目
 
 创建一个springboot项目oauth2-login-demo，创建时引入如下依赖
 
-[![image-20230510165314829](./images/image-20230510165314829-1742615211632-18.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20230510165314829.png)
+[![image-20230510165314829](images/SpringSecurity/image-20230510165314829-1742615211632-18.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20230510165314829.png)
 
 示例代码参考：[spring-security-samples/servlet/spring-boot/java/oauth2/login at 6.2.x · spring-projects/spring-security-samples (github.com)](https://github.com/spring-projects/spring-security-samples/tree/6.2.x/servlet/spring-boot/java/oauth2/login)
 
@@ -1797,7 +1797,7 @@ resources/templates/index.html
 7. GitHub返回用户数据
 8. **A 网站使用 GitHub用户数据登录**
 
-[![image-20231223203225688](./images/image-20231223203225688-1742615211632-19.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231223203225688.png)
+[![image-20231223203225688](images/SpringSecurity/image-20231223203225688-1742615211632-19.png)](https://github.com/zj499063104/StudyNotes/blob/master/尚硅谷SpringSecurity和OAuth2实战精讲/笔记/assets/image-20231223203225688.png)
 
 ### CommonOAuth2Provider
 

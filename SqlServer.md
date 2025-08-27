@@ -6,7 +6,7 @@
 
 **数据表展现形式：**
 
-![001](images/001.PNG)
+![001](images/SqlServer/001.PNG)
 
 **主流关系型数据库：** SQL SERVER，MySQL，Oracle等。
 
@@ -16,7 +16,7 @@
 
 （2）百度搜索"I tell you"，或者访问 https://msdn.itellyou.cn/
 
-![002](images/002.PNG)
+![002](images/SqlServer/002.PNG)
 
 **打开数据库：**
 
@@ -1010,6 +1010,20 @@ Select CONVERT(varchar(20),GETDATE(),14)          --15:05:49:330
 | 分钟         | minute      | mi,n      |
 | 秒           | second      | ss,s      |
 | 毫秒         | millisecond | ms        |
+
+## isnull, nullif
+
+```sql
+select p.product_id,
+isnull(round(sum(p.price * u.units) * 1.0 / NULLIF(sum(u.units), 0), 2), 0) as average_price
+from Prices p
+left join UnitsSold u on p.product_id = u.product_id
+and u.purchase_date between p.start_date and p.end_date  
+group by p.product_id
+
+当round(sum(p.price * u.units) * 1.0 / sum(u.units), 2)为null时返回0
+当sum(u.units)为0时返回null
+```
 
 # 分组查询
 

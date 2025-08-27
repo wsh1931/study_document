@@ -579,7 +579,7 @@ array([2.,  4.,  6.])
 
 ​	结果等同于 `b` 为数组的先前示例。我们可以将标量 `b` 视为在算术运算期间被*拉伸*成与 `a` 相同形状的数组。`b` 中的新元素（如[图 1](https://numpy.com.cn/doc/stable/user/basics.broadcasting.html#broadcasting-figure-1) 所示）只是原始标量的副本。拉伸的比喻只是概念性的。NumPy 足够智能，可以在不实际复制的情况下使用原始标量值，从而使广播操作在内存和计算上尽可能高效。
 
-![A scalar is broadcast to match the shape of the 1-d array it is being multiplied to.](images/broadcasting_1.png)
+![A scalar is broadcast to match the shape of the 1-d array it is being multiplied to.](images/NumPy/broadcasting_1.png)
 
 ​											图 1
 
@@ -677,11 +677,11 @@ a + b
 
 如图 2 所示，`b` 被添加到 `a` 的每一行。在图3中，由于形状不兼容而引发异常。
 
-![image-20250815141918262](images/image-20250815141918262.png)
+![image-20250815141918262](images/NumPy/image-20250815141918262.png)
 
 *一维数组添加到二维数组时，如果一维数组的元素数量与二维数组的列数匹配，则会发生广播。*
 
-![image-20250815141931825](images/image-20250815141931825.png)
+![image-20250815141931825](images/NumPy/image-20250815141931825.png)
 
 当数组的尾部维度不相等时，广播会失败，因为无法将第一个数组行中的值与第二个数组的元素对齐以进行逐元素相加。
 
@@ -694,7 +694,7 @@ b = np.array([1.0, 2.0, 3.0])
 a[:, np.newaxis] + b
 ```
 
-![image-20250815141957707](images/image-20250815141957707.png)
+![image-20250815141957707](images/NumPy/image-20250815141957707.png)
 
 在某些情况下，广播会拉伸两个数组以形成一个比任何初始数组都大的输出数组。
 
@@ -724,7 +724,7 @@ Codes            (2d array):  4 x 2
 Diff             (2d array):  4 x 2
 ```
 
-![image-20250815142057442](images/image-20250815142057442.png)
+![image-20250815142057442](images/NumPy/image-20250815142057442.png)
 
 通常，大量 `observations`（可能从数据库读取）与一组 `codes` 进行比较。考虑这个场景
 

@@ -330,11 +330,11 @@ Python的浮点数也没有大小限制，但是超出一定范围就直接表�
 
 ​	用记事本编辑的时候，从文件读取的UTF-8字符被转换为Unicode字符到内存里，编辑完成后，保存的时候再把Unicode转换为UTF-8保存到文件：
 
-![rw-file-utf-8](images/file.png)
+![rw-file-utf-8](images/Python/Python/file.png)
 
 浏览网页的时候，服务器会把动态生成的Unicode内容转换为UTF-8再传输到浏览器：
 
-![web-utf-8](images/webpage.png)
+![web-utf-8](images/Python/webpage.png)
 
 所以你看到很多网页的源码上会有类似`<meta charset="UTF-8" />`的信息，表示该网页正是用的UTF-8编码。
 
@@ -710,11 +710,11 @@ Python在显示只有1个元素的tuple时，也会加一个逗号，以免你�
 
 别急，我们先看看定义的时候tuple包含的3个元素：
 
-![tuple-1](images/step-1.png)
+![tuple-1](images/Python/step-1.png)
 
 当我们把list的元素`'A'`和`'B'`修改为`'X'`和`'Y'`后，tuple变为：
 
-![tuple-2](images/step-2.png)
+![tuple-2](images/Python/step-2.png)
 
 表面上看，tuple的元素确实变了，但其实变的不是tuple的元素，而是list的元素。tuple一开始指向的list并没有改成别的list，所以，tuple所谓的“不变”是说，tuple的每个元素，指向永远不变。即指向`'a'`，就不能改成指向`'b'`，指向一个list，就不能改成指向其他对象，但指向的这个list本身是可变的！
 

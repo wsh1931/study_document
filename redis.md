@@ -18,11 +18,11 @@
 
 > 修改application_original.yaml  为  application.yaml 并且修改文件中关于数据库和Redis的配置
 
-![image-20230721114107678](./images/image-20230721114107678.png)
+![image-20230721114107678](images/redis/image-20230721114107678.png)
 
 > 修改 `IMAGE_UPLOAD_DIR `字段为你nginx的地址，使得发布笔记的图片保存到你的nginx中
 
-![image-20230831160214805](./images/image-20230831160214805.png)
+![image-20230831160214805](images/redis/image-20230831160214805.png)
 
 
 
@@ -46,7 +46,7 @@
 
 登录流程图
 
-![image-20230720145011054](./images/image-20230720145011054.png)
+![image-20230720145011054](images/redis/image-20230720145011054.png)
 
 发送短信验证码（这里是没有真实实现短信验证码，后续考虑加上）
 
@@ -104,7 +104,7 @@ public Result login(LoginFormDTO loginForm, HttpSession session) {
 
 拦截器
 
-![image-20230720145313615](./images/image-20230720145313615.png)
+![image-20230720145313615](images/redis/image-20230720145313615.png)
 
 ThreadLocal
 
@@ -203,7 +203,7 @@ public Result me(){
 
 所以咱们后来采用的方案都是基于redis来完成，我们把session换成redis，redis数据本身就是共享的，就可以避免session共享的问题了。
 
-![image-20230720150449339](./images/image-20230720150449339.png)
+![image-20230720150449339](images/redis/image-20230720150449339.png)
 
 
 
@@ -211,7 +211,7 @@ public Result me(){
 
 流程图
 
-![image-20230721112018131](./images/image-20230721112018131.png)
+![image-20230721112018131](images/redis/image-20230721112018131.png)
 
 登录
 
@@ -373,15 +373,15 @@ public class MvcConfig implements WebMvcConfigurer {
 
 **添加缓存**
 
-![image-20230721151953565](./images/image-20230721151953565.png)
+![image-20230721151953565](images/redis/image-20230721151953565.png)
 
 **更新缓存**
 
-![image-20230721152043380](./images/image-20230721152043380.png)
+![image-20230721152043380](images/redis/image-20230721152043380.png)
 
 **更新缓存时解决数据不一致**
 
-![image-20230721152136958](./images/image-20230721152136958.png)
+![image-20230721152136958](images/redis/image-20230721152136958.png)
 
 在以上三种方案中，我们选择第一种方案。
 
@@ -475,11 +475,11 @@ public Result updateShop(Shop shop) {
 
 这种方式优点在于节约内存空间，存在误判，误判原因在于：布隆过滤器走的是哈希思想，只要哈希思想，就可能存在哈希冲突
 
-![image-20230724143209002](./images/image-20230724143209002.png)
+![image-20230724143209002](images/redis/image-20230724143209002.png)
 
 **使用缓存空对象解决缓存穿透**
 
-![image-20230724143416245](./images/image-20230724143416245.png)
+![image-20230724143416245](images/redis/image-20230724143416245.png)
 
 查询商铺使用缓存空字符串来解决缓存穿透
 
@@ -536,13 +536,13 @@ private Shop queryShopWithCacheNull(Long id){
 * 给缓存业务添加降级限流策略
 * 给业务添加多级缓存
 
-![image-20230724145903799](./images/image-20230724145903799.png)
+![image-20230724145903799](images/redis/image-20230724145903799.png)
 
 ### 缓存击穿
 
 缓存击穿问题也叫**热点Key**问题，就是一个被**高并发访问并且缓存重建业务较复杂的key突然失效**了，无数的请求访问会在瞬间给数据库带来巨大的冲击。
 
-![image-20230724150012654](./images/image-20230724150012654.png)
+![image-20230724150012654](images/redis/image-20230724150012654.png)
 
 常见的解决方案有两种：
 
@@ -555,11 +555,11 @@ private Shop queryShopWithCacheNull(Long id){
 
 假设现在线程1过来访问，他查询缓存没有命中，但是此时他获得到了锁的资源，那么线程1就会一个人去执行逻辑，假设现在线程2过来，线程2在执行过程中，并没有获得到锁，那么线程2就可以进行到休眠，直到线程1把锁释放后，线程2获得到锁，然后再来执行逻辑，此时就能够从缓存中拿到数据了。
 
-![image-20230724150118298](./images/image-20230724150118298.png)
+![image-20230724150118298](images/redis/image-20230724150118298.png)
 
 业务流程
 
-![image-20230724150307685](./images/image-20230724150307685.png)
+![image-20230724150307685](images/redis/image-20230724150307685.png)
 
 **这里使用了redis的setnx方法来表示获取锁，该方法含义是redis中如果没有这个key，则插入成功**
 
@@ -631,11 +631,11 @@ private Shop queryWithMutex(Long id){
 
 这种方案巧妙在于，异步的构建缓存，缺点在于在构建完缓存之前，返回的都是脏数据。
 
-![image-20230724150218092](./images/image-20230724150218092.png)
+![image-20230724150218092](images/redis/image-20230724150218092.png)
 
 流程图
 
-![image-20230724160309351](./images/image-20230724160309351.png)
+![image-20230724160309351](images/redis/image-20230724160309351.png)
 
 
 
@@ -707,7 +707,7 @@ private Shop queryWithLogicalExpire(Long id){
 
 **逻辑过期方案：** 线程读取过程中不需要等待，性能好，有一个额外的线程持有锁去进行重构数据，但是在重构数据完成前，其他的线程只能返回之前的数据，且实现起来麻烦
 
-![image-20230724150239992](./images/image-20230724150239992.png)
+![image-20230724150239992](images/redis/image-20230724150239992.png)
 
 ### 封装工具类
 
@@ -937,11 +937,11 @@ public Result queryShopById(Long id) {
 
 **全局ID生成器**，是一种在分布式系统下用来生成全局唯一ID的工具，一般要满足下列特性：
 
-![image-20230727155925189](./images/image-20230727155925189.png)
+![image-20230727155925189](images/redis/image-20230727155925189.png)
 
 为了增加ID的安全性，我们可以不直接使用Redis自增的数值，而是拼接一些其它信息：
 
-![image-20230727155940774](./images/image-20230727155940774.png)
+![image-20230727155940774](images/redis/image-20230727155940774.png)
 
 ID的组成部分：符号位：1bit，永远为0
 
@@ -987,13 +987,13 @@ public class RedisIdWorker {
 
 ### 优惠券秒杀（乐观锁）
 
-![image-20230727160922714](./images/image-20230727160922714.png)
+![image-20230727160922714](images/redis/image-20230727160922714.png)
 
 考虑出现  **超卖**  问题：
 
 ​		假设线程1过来查询库存，判断出来库存大于1，正准备去扣减库存，但是还没有来得及去扣减，此时线程2过来，线程2也去查询库存，发现这个数量一定也大于1，那么这两个线程都会去扣减库存，最终多个线程相当于一起去扣减库存，此时就会出现库存的超卖问题。
 
-![image-20230727161027887](./images/image-20230727161027887.png)
+![image-20230727161027887](images/redis/image-20230727161027887.png)
 
 **悲观锁：**
 
@@ -1049,7 +1049,7 @@ public Result seckillVoucher(Long voucherId) {
 
 ### 一人一单（悲观锁）
 
-![image-20230731154038956](./images/image-20230731154038956.png)
+![image-20230731154038956](images/redis/image-20230731154038956.png)
 
 **问题：**现在的问题还是和之前一样，并发过来，查询数据库，都不存在订单，所以我们还是需要加锁，但是乐观锁比较适合更新数据，而现在是插入数据，所以我们需要使用悲观锁操作。
 
@@ -1203,7 +1203,7 @@ public  Result createVoucherOrder(Long voucherId) {
 
 在集群环境下，部署了多个tomcat，每个tomcat都有一个属于自己的jvm，那么假设在服务器A的tomcat内部，有两个线程，这两个线程由于使用的是同一份代码，那么他们的锁对象是同一个，是可以实现互斥的，但是如果现在是服务器B的tomcat内部，又有两个线程，但是他们的锁对象写的虽然和服务器A一样，但是锁对象却不是同一个，所以线程3和线程4可以实现互斥，但是却无法和线程1和线程2实现互斥，这就是 集群环境下，syn锁失效的原因，在这种情况下，我们就需要使用分布式锁来解决这个问题。
 
-![image-20230731155536564](./images/image-20230731155536564.png)
+![image-20230731155536564](images/redis/image-20230731155536564.png)
 
 
 
@@ -1220,7 +1220,7 @@ upstream backend {
 
 启动两个springboot项目，端口分别为8081 和 8082
 
-![image-20230731160954767](./images/image-20230731160954767.png)
+![image-20230731160954767](images/redis/image-20230731160954767.png)
 
 
 
@@ -1232,7 +1232,7 @@ upstream backend {
 
 分布式锁：满足分布式系统或集群模式下多进程可见并且互斥的锁。
 
-![image-20230801142554967](./images/image-20230801142554967.png)
+![image-20230801142554967](images/redis/image-20230801142554967.png)
 
 可见性：多个线程都能看到相同的结果
 
@@ -1254,7 +1254,7 @@ Redis：redis作为分布式锁是非常常见的一种使用方式，现在企�
 
 Zookeeper：zookeeper也是企业级开发中较好的一个实现分布式锁的方案（后续补充相关知识点）
 
-![image-20230801142641636](./images/image-20230801142641636.png)
+![image-20230801142641636](images/redis/image-20230801142641636.png)
 
 ### 使用redis实现分布式锁
 
@@ -1278,11 +1278,11 @@ Zookeeper：zookeeper也是企业级开发中较好的一个实现分布式锁�
 
 持有锁的线程在锁的内部出现了阻塞，导致他的锁自动释放，这时其他线程，线程2来尝试获得锁，就拿到了这把锁，然后线程2在持有锁执行过程中，线程1反应过来，继续执行，而线程1执行过程中，走到了删除锁逻辑，此时就会把本应该属于线程2的锁进行删除，这就是误删别人锁的情况说明。
 
-![image-20230801143028474](./images/image-20230801143028474.png)
+![image-20230801143028474](images/redis/image-20230801143028474.png)
 
 **解决方案**：获取锁的时候，对应的value是自己的进程标识，为了区分不同jvm中的进程id，使用UUID来区分
 
-![image-20230801143259383](./images/image-20230801143259383.png)
+![image-20230801143259383](images/redis/image-20230801143259383.png)
 
 **代码实现**：
 
@@ -1389,13 +1389,13 @@ public Result seckillVoucher(Long voucherId) {
 
 线程1现在持有锁之后，在执行业务逻辑过程中，他正准备删除锁，而且已经走到了条件判断的过程中，比如他已经拿到了当前这把锁确实是属于他自己的，正准备删除锁，但是此时他的锁到期了，那么此时线程2进来，但是线程1他会接着往后执行，当他卡顿结束后，他直接就会执行删除锁那行代码，相当于条件判断并没有起到作用，这就是删锁时的原子性问题，之所以有这个问题，是因为线程1的拿锁，比锁，删锁，实际上并不是原子性的，我们要防止刚才的情况发生。
 
-![image-20230801145414706](./images/image-20230801145414706.png)
+![image-20230801145414706](images/redis/image-20230801145414706.png)
 
 **解决方案**：使用Lua脚本实现比较锁和释放锁两个动作的一致性
 
 unlock.lua 脚本，放在resource路径下
 
-![image-20230801151703671](./images/image-20230801151703671.png)
+![image-20230801151703671](images/redis/image-20230801151703671.png)
 
 ```lua
 -- 这里的 KEYS[1] 就是锁的key，这里的ARGV[1] 就是当前线程标示
@@ -1457,7 +1457,7 @@ public void unlock() {
 
 **主从一致性：** 如果Redis提供了主从集群，当我们向集群写数据时，主机需要异步的将数据同步给从机，而万一在同步过去之前，主机宕机了，就会出现死锁问题。
 
-![image-20230801155811629](./images/image-20230801155811629.png)
+![image-20230801155811629](images/redis/image-20230801155811629.png)
 
 ### 分布式锁-Redission简单介绍
 
@@ -1537,7 +1537,7 @@ public Result seckillVoucher(Long voucherId) {
 
 用一个变量记录该线程重入这把锁的次数，用redis中的hash结构实现。每次拿到锁计数器加一，只有当计数器为0时才回释放锁。
 
-![image-20230801161342036](./images/image-20230801161342036.png)
+![image-20230801161342036](images/redis/image-20230801161342036.png)
 
 ### 重试和超时释放
 
@@ -1545,7 +1545,7 @@ public Result seckillVoucher(Long voucherId) {
 
 超时续约：利用watchDog，每隔一段时间（releaseTime / 3），重置超时时间
 
-![image-20230801161752805](./images/image-20230801161752805.png)
+![image-20230801161752805](images/redis/image-20230801161752805.png)
 
 ### 主从一致性问题
 
@@ -1555,11 +1555,11 @@ public Result seckillVoucher(Long voucherId) {
 
 此时我们去写命令，写在主机上， 主机会将数据同步给从机，但是假设在主机还没有来得及把数据写入到从机去的时候，此时主机宕机，哨兵会发现主机宕机，并且选举一个slave变成master，而此时新的master中实际上并没有锁信息，此时锁信息就已经丢掉了。
 
-![image-20230801162337178](./images/image-20230801162337178.png)
+![image-20230801162337178](images/redis/image-20230801162337178.png)
 
 为了解决这个问题，redission提出来了MutiLock锁，使用这把锁咱们就不使用主从了，每个节点的地位都是一样的， 这把锁加锁的逻辑需要写入到每一个主丛节点上，只有所有的服务器都写入成功，此时才是加锁成功，假设现在某个节点挂了，那么他去获得锁的时候，只要有一个节点拿不到，都不能算是加锁成功，就保证了加锁的可靠性。
 
-![image-20230801162330770](./images/image-20230801162330770.png)
+![image-20230801162330770](images/redis/image-20230801162330770.png)
 
 ### 总结
 
@@ -1605,7 +1605,7 @@ public Result seckillVoucher(Long voucherId) {
 
 解决方案：前4步操作我们交给redis去完成，最后两步操作我们交给异步queue。只要判断能够下单之后，直接返回前端成功。
 
-![image-20230803153449433](./images/image-20230803153449433.png)
+![image-20230803153449433](images/redis/image-20230803153449433.png)
 
 ### 使用redis判断下单资格
 
@@ -1818,7 +1818,7 @@ public  void createVoucherOrder(VoucherOrder voucherOrder) {
 队列是入口和出口不在一边，因此我们可以利用：LPUSH 结合 RPOP、或者 RPUSH 结合 LPOP来实现。
 不过要注意的是，当队列中没有消息时RPOP或LPOP操作会返回null，并不像JVM的阻塞队列那样会阻塞并等待消息。因此这里应该使用BRPOP或者BLPOP来实现阻塞效果。
 
-![image-20230809161831486](./images/image-20230809161831486.png)
+![image-20230809161831486](images/redis/image-20230809161831486.png)
 
 基于List的消息队列有哪些优缺点？
 优点：
@@ -1840,7 +1840,7 @@ PubSub（发布订阅）是Redis2.0版本引入的消息传递模型。顾名思
  PUBLISH channel msg ：向一个频道发送消息
  PSUBSCRIBE pattern[pattern] ：订阅与pattern格式匹配的所有频道
 
-![image-20230809161853273](./images/image-20230809161853273.png)
+![image-20230809161853273](images/redis/image-20230809161853273.png)
 
 基于PubSub的消息队列有哪些优缺点？
 优点：
@@ -1859,11 +1859,11 @@ Stream 是 Redis 5.0 引入的一种新数据类型，可以实现一个功能�
 
 > XADD key ID field value [field value ...]
 
-![image-20230809162218533](./images/image-20230809162218533.png)
+![image-20230809162218533](images/redis/image-20230809162218533.png)
 
 > XREAD [COUNT count] [BLOCK milliseconds] STREAMS key [key ...] id [id ...]
 
-![image-20230809162309888](./images/image-20230809162309888.png)
+![image-20230809162309888](images/redis/image-20230809162309888.png)
 
 
 
@@ -1871,7 +1871,7 @@ Stream 是 Redis 5.0 引入的一种新数据类型，可以实现一个功能�
 
 **消费者组**：将多个消费者划分到一个组中，监听同一个队列。
 
-![image-20230809162425362](./images/image-20230809162425362.png)
+![image-20230809162425362](images/redis/image-20230809162425362.png)
 
 
 
@@ -1934,7 +1934,7 @@ XREADGROUP GROUP group consumer [COUNT count] [BLOCK milliseconds] [NOACK] STREA
 
 ### Redis中三种消息队列的对比
 
-![image-20230809162722252](./images/image-20230809162722252.png)
+![image-20230809162722252](images/redis/image-20230809162722252.png)
 
 
 
@@ -2068,7 +2068,7 @@ XGROUP CREATE stream.orders g1 0 MKSTREAM
 
 > 修改 `IMAGE_UPLOAD_DIR `字段为你nginx的地址，使得发布笔记的图片保存到你的nginx中
 
-![image-20230831103530264](./images/image-20230831103530264.png)
+![image-20230831103530264](images/redis/image-20230831103530264.png)
 
 ### 查询笔记详情
 
@@ -2288,11 +2288,11 @@ public Result followCommons(Long id) {
 
 对于传统的模式的内容解锁：我们是需要用户去通过搜索引擎或者是其他的方式去解锁想要看的内容
 
-![image-20230831155309152](./images/image-20230831155309152.png)
+![image-20230831155309152](images/redis/image-20230831155309152.png)
 
 对于新型的Feed流的的效果：不需要我们用户再去推送信息，而是系统分析用户到底想要什么，然后直接把内容推送给用户，从而使用户能够更加的节约时间，不用主动去寻找。
 
-![image-20230831155316191](./images/image-20230831155316191.png)
+![image-20230831155316191](images/redis/image-20230831155316191.png)
 
 Feed流的实现有两种模式：
 
@@ -2324,7 +2324,7 @@ Timeline：不做内容筛选，简单的按照内容发布时间排序，常用
 
 缺点：比较延迟，当用户读取数据时才去关注的人里边去读取数据，假设用户关注了大量的用户，那么此时就会拉取海量的内容，对服务器压力巨大。
 
-![image-20230831155325105](./images/image-20230831155325105.png)
+![image-20230831155325105](images/redis/image-20230831155325105.png)
 
 **推模式**：也叫做写扩散。
 
@@ -2334,13 +2334,13 @@ Timeline：不做内容筛选，简单的按照内容发布时间排序，常用
 
 缺点：内存压力大，假设一个大V写信息，很多人关注他， 就会写很多分数据到粉丝那边去
 
-![image-20230831155339273](./images/image-20230831155339273.png)
+![image-20230831155339273](images/redis/image-20230831155339273.png)
 
 **推拉结合模式**：也叫做读写混合，兼具推和拉两种模式的优点。
 
 推拉模式是一个折中的方案，站在发件人这一段，如果是个普通的人，那么我们采用写扩散的方式，直接把数据写入到他的粉丝中去，因为普通的人他的粉丝关注量比较小，所以这样做没有压力，如果是大V，那么他是直接将数据先写入到一份到发件箱里边去，然后再直接写一份到活跃粉丝收件箱里边去，现在站在收件人这端来看，如果是活跃粉丝，那么大V和普通的人发的都会直接写入到自己收件箱里边来，而如果是普通的粉丝，由于他们上线不是很频繁，所以等他们上线时，再从发件箱里边去拉信息。
 
-![image-20230831155348513](./images/image-20230831155348513.png)
+![image-20230831155348513](images/redis/image-20230831155348513.png)
 
 ### 用推模式实现获取关注用户的博文
 
@@ -2547,7 +2547,7 @@ public Result queryShopByType(Integer typeId, Integer current, Double x, Double 
 
 Redis中是利用string类型数据结构实现BitMap，因此最大上限是512M，转换为bit则是 2^32个bit位。
 
-![image-20230905143922634](./images/image-20230905143922634.png)
+![image-20230905143922634](images/redis/image-20230905143922634.png)
 
 BitMap的操作命令有：
 
@@ -2613,4 +2613,4 @@ public void testHyperLogLog(){
 }
 ```
 
-![image-20230905145351081](./images/image-20230905145351081.png)
+![image-20230905145351081](images/redis/image-20230905145351081.png)

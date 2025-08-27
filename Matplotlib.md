@@ -24,7 +24,7 @@ Matplotlib有两种画图接口：一个是便捷的MATLAB风格的有状态的�
 
 ## 折线图
 
-![image-20250819113915375](images/image-20250819113915375.png)
+![image-20250819113915375](images/Matplotlib/image-20250819113915375.png)
 
 ```py
 import matplotlib.pyplot as plt
@@ -107,7 +107,7 @@ plt.show()
 
 ## 条形图
 
-![image-20250819113934066](images/image-20250819113934066.png)
+![image-20250819113934066](images/Matplotlib/image-20250819113934066.png)
 
 ```py
 import matplotlib.pyplot as plt
@@ -144,7 +144,7 @@ plt.show()
 
 ## 饼图
 
-![image-20250820092614201](images/image-20250820092614201.png)
+![image-20250820092614201](images/Matplotlib/image-20250820092614201.png)
 
 ```py
 import matplotlib.pyplot as plt
@@ -166,7 +166,7 @@ plt.show()
 
 ## 环形图
 
-![image-20250820092941991](images/image-20250820092941991.png)
+![image-20250820092941991](images/Matplotlib/image-20250820092941991.png)
 
 ```py
 import matplotlib.pyplot as plt
@@ -196,7 +196,7 @@ plt.show()
 
 ## 爆炸式饼图
 
-![image-20250820093218831](images/image-20250820093218831.png)
+![image-20250820093218831](images/Matplotlib/image-20250820093218831.png)
 
 ```py
 import matplotlib.pyplot as plt
@@ -222,7 +222,7 @@ plt.show()
 
 ## 散点图
 
-![image-20250820093604215](images/image-20250820093604215.png)
+![image-20250820093604215](images/Matplotlib/image-20250820093604215.png)
 
 ```py
 import matplotlib.pyplot as plt
@@ -251,7 +251,7 @@ for i in range(len(study_hours)):
 plt.show()
 ```
 
-![image-20250820094524750](images/image-20250820094524750.png)
+![image-20250820094524750](images/Matplotlib/image-20250820094524750.png)
 
 ```py
 import matplotlib.pyplot as plt
@@ -318,7 +318,7 @@ plt.show()
 
 ## 箱线图
 
-![image-20250820094810665](images/image-20250820094810665.png)
+![image-20250820094810665](images/Matplotlib/image-20250820094810665.png)
 
 ```py
 import matplotlib.pyplot as plt
@@ -373,7 +373,7 @@ plt.show()
 
 ## 多个图表的绘制
 
-![image-20250820095120442](images/image-20250820095120442.png)
+![image-20250820095120442](images/Matplotlib/image-20250820095120442.png)
 
 ```py
 import matplotlib.pyplot as plt

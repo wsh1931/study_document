@@ -11,9 +11,9 @@ spring:
     mode: HTML5
 ```
 
-![image-20250807153157819](images/image-20250807153157819.png)
+![image-20250807153157819](images/Thymeleaf/image-20250807153157819.png)
 
-![image-20250807153235870](images/image-20250807153235870.png)
+![image-20250807153235870](images/Thymeleaf/image-20250807153235870.png)
 
 # 访问页面
 
@@ -125,9 +125,9 @@ function parseBaseZhiKongGuiZeVo(str) {
 
 ## 效果
 
-![image-20250815140454980](images/image-20250815140454980.png)
+![image-20250815140454980](images/Thymeleaf/image-20250815140454980.png)
 
-![image-20250815140510075](images/image-20250815140510075.png)
+![image-20250815140510075](images/Thymeleaf/image-20250815140510075.png)
 
 ## 后端代码
 
