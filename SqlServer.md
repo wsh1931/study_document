@@ -804,6 +804,12 @@ select ROUND(AVG(PeopleSalary),2)  平均工资 from People
 select Convert(decimal(12,2),AVG(PeopleSalary))  平均工资 from People
 ```
 
+（6）日期格式化
+
+```sql
+format(trans_date, 'yyyy-MM') # 2018-12-18 -> 2018-12
+```
+
 ROUND函数用法：
 
 ```sql
